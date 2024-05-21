@@ -1,0 +1,21 @@
+package MyAdder1
+import chisel3._
+
+class top extends Module {
+  val io = IO(
+    new Bundle {
+      val in0 = Input(UInt(32.W))
+      val in1 = Input(UInt(32.W))
+      val in2 = Input(UInt(32.W))
+      val in3 = Input(UInt(32.W))
+      val out = Output(UInt(32.W))
+    })
+//  def adder(a:UInt,b:UInt):UInt = a+b
+
+//  val a2 = adder(io.in2, io.in3)
+  val a2 = (a:UInt,b:UInt) => (a + b);
+  val a1 = (a:UInt,b:UInt) => (a + b);
+//  val a1 = adder(io.in0, io.in1)
+  io.out := adder(a1(io.in0,io.in1), a2(io.in2,io.in3))
+}
+
