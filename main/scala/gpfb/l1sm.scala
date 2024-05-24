@@ -21,8 +21,8 @@ class l1smIO extends Bundle {
   val entry_create_dp_vld = Input(UInt(1.W))
   val entry_inst_new_va = Input(UInt(40.W))
   val entry_l1_dist_strideh = Input(UInt(40.W))
-  val entry_mmu_pe_req = Input(UInt(1.W))
-  val entry_mmu_pe_req_grnt = Input(UInt(1.W))
+  val entry_mmu_pe_req = Input(Bool())
+  val entry_mmu_pe_req_grnt = Input(Bool())
   val entry_mmu_pe_req_src = Input(UInt(2.W))
   val entry_pf_inst_vld = Input(UInt(1.W))
   val entry_pop_vld = Input(UInt(1.W))
@@ -35,14 +35,14 @@ class l1smIO extends Bundle {
   val ld_da_page_share_ff = Input(UInt(1.W))
   val ld_da_ppn_ff = Input(UInt(28.W))
   val pad_yy_icg_scan_en = Input(UInt(1.W))
-  val pfu_biu_pe_req_sel_l1 = Input(UInt(1.W))
+  val pfu_biu_pe_req_sel_l1 = Input(Bool())
   val pfu_dcache_pref_en = Input(UInt(1.W))
   val pfu_get_page_sec = Input(UInt(1.W))
   val pfu_get_page_share = Input(UInt(1.W))
   val pfu_get_ppn = Input(UInt(28.W))
   val pfu_get_ppn_err = Input(UInt(1.W))
   val pfu_get_ppn_vld = Input(UInt(1.W))
-  val pfu_mmu_pe_req_sel_l1 = Input(UInt(1.W))
+  val pfu_mmu_pe_req_sel_l1 = Input(Bool())
   val entry_l1_biu_pe_req_set = Output(UInt(1.W))
   val entry_l1_cmp_va_vld = Output(Bool())
   val entry_l1_mmu_pe_req_set = Output(UInt(1.W))
@@ -78,15 +78,15 @@ class l1smwire extends Bundle{
   val entry_l1_pf_va_clk		 = 	Clock()
   val entry_l1_pf_va_clk_en		 = 	Bool()
   val entry_l1_pf_va_cross_4k		 = 	UInt(1.W)
-  val entry_l1_pf_va_eq_inst_new_va		 = 	UInt(1.W)
+  val entry_l1_pf_va_eq_inst_new_va		 = Bool()
   val entry_l1_pf_va_sub_inst_new_va		 = 	UInt(40.W)
   val entry_l1_pf_va_sum_4k		 = 	UInt(13.W)
   val entry_l1_vpn		 = 	UInt(28.W)
   val entry_l1sm_diff_sub_dist_strideh		 = 	UInt(40.W)
   val entry_l1sm_reinit_req		 = 	UInt(1.W)
 
-  val entry_mmu_pe_req		 = 	UInt(1.W)
-  val entry_mmu_pe_req_grnt		 = 	UInt(1.W)
+  val entry_mmu_pe_req		 = 	Bool()
+  val entry_mmu_pe_req_grnt		 = 	Bool()
   val entry_mmu_pe_req_src		 = 	UInt(2.W)
   val entry_pf_inst_vld		 = 	Bool()
   val entry_pop_vld		 = 	UInt(1.W)
@@ -99,14 +99,14 @@ class l1smwire extends Bundle{
   val ld_da_page_share_ff		 = 	UInt(1.W)
   val ld_da_ppn_ff		 = 	UInt(28.W)
   val pad_yy_icg_scan_en		 = 	UInt(1.W)
-  val pfu_biu_pe_req_sel_l1		 = 	UInt(1.W)
+  val pfu_biu_pe_req_sel_l1		 = 	Bool()
   val pfu_dcache_pref_en		 = 	Bool()
   val pfu_get_page_sec		 = 	UInt(1.W)
   val pfu_get_page_share		 = 	UInt(1.W)
   val pfu_get_ppn		 = 	UInt(28.W)
   val pfu_get_ppn_err		 = 	UInt(1.W)
-  val pfu_get_ppn_vld		 = 	UInt(1.W)
-  val pfu_mmu_pe_req_sel_l1		 = 	UInt(1.W)
+  val pfu_get_ppn_vld		 = 	Bool()
+  val pfu_mmu_pe_req_sel_l1		 = 	Bool()
 }
 class l1smreg extends Bundle{
   val entry_in_l1_pf_region = UInt(1.W);
@@ -194,7 +194,10 @@ class l1sm (PA_WIDTH:Int) extends RawModule {
       entry_l1_page_share            := wire.pfu_get_page_share
     }
 
+
+    wire.entry_l1_pf_addr(PA_WIDTH-1,0)  :=entry_l1_pf_ppn(PA_WIDTH-13,0) ## io.entry_l1_pf_va(11,0);
   }
+
   //pfu pipeline control signal
   withClockAndReset(io.entry_clk,(!io.cpurst_b.asBool).asAsyncReset){
     val entry_l1_cmp_va_vld = RegInit(reg.entry_l1_cmp_va_vld,"b0".U(1.W).asBool)
@@ -219,7 +222,8 @@ class l1sm (PA_WIDTH:Int) extends RawModule {
     }.elsewhen(io.entry_l1_cmp_va_vld && io.entry_l1sm_va_can_cmp) {
       entry_inst_new_va_surpass_l1_pf_va := wire.entry_inst_new_va_surpass_l1_pf_va_set
     }
-    wire.entry_l1_biu_pe_req_set  := (entry_l1_state.asUInt === args.L1_REQ_PF.asUInt) &&  entry_in_l1_pf_region.asBool
+    wire.entry_l1_biu_pe_req_set  := (entry_l1_state.asUInt === args.L1_REQ_PF.asUInt) &&  entry_in_l1_pf_region.asBool &&  !wire.entry_l1_biu_pe_req
+    wire.entry_l1sm_reinit_req  := io.entry_l1sm_va_can_cmp &&  entry_inst_new_va_surpass_l1_pf_va.asBool
   }
   /*  //有另外一种实现方法：使用regnext，将when的第一个判断和复位信号用或连接起来变成一个复位信号，otherwise始终跟随。上下两个同理
   withClockAndReset(io.entry_clk.asBool.asClock,io.cpurst_b.asBool.asAsyncReset){
@@ -315,57 +319,39 @@ class l1sm (PA_WIDTH:Int) extends RawModule {
   //----------------set biu_pe_req reg------------------------
   // &Force("bus","entry_biu_pe_req_src","1","0"); @237
    wire.entry_l1_biu_pe_req      := io.entry_biu_pe_req &&  io.entry_biu_pe_req_src(0).asBool
+//一些和reg相关的，合并到时钟域内了
 
+   wire.entry_l1_biu_pe_req_grnt := wire.pfu_biu_pe_req_sel_l1 &&  io.entry_biu_pe_req_grnt;
 
-    &&  !entry_l1_biu_pe_req;
-
-  assign entry_l1_biu_pe_req_grnt = pfu_biu_pe_req_sel_l1
-  &&  entry_biu_pe_req_grnt;
-
-  assign entry_l1_pf_addr[`PA_WIDTH-1:0]  = {entry_l1_pf_ppn[`PA_WIDTH-13:0],
-  entry_l1_pf_va[11:0]};
 //==========================================================
 //                 State 3 : req mmu
 //==========================================================
 // &Force("bus","entry_mmu_pe_req_src","1","0"); @253
-assign entry_l1_mmu_pe_req      = entry_mmu_pe_req
-&&  entry_mmu_pe_req_src[0];
-
-assign entry_l1_mmu_pe_req_set  = entry_l1sm_is_req_mmu
-&&  !entry_l1_mmu_pe_req;
-
-assign entry_l1_mmu_pe_req_grnt = entry_mmu_pe_req_grnt
-&&  pfu_mmu_pe_req_sel_l1;
-
+  wire.entry_l1_mmu_pe_req      := wire.entry_mmu_pe_req &&  io.entry_mmu_pe_req_src(0).asBool
+  wire.entry_l1_mmu_pe_req_set  := (entry_l1_state.asUInt === args.L1_REQ_MMU.asUInt)  &&  !wire.entry_l1_mmu_pe_req
+  wire.entry_l1_mmu_pe_req_grnt := wire.entry_mmu_pe_req_grnt &&  wire.pfu_mmu_pe_req_sel_l1
 //==========================================================
 //                 State 4 : wait ppn
 //==========================================================
-assign entry_l1_pf_ppn_up_vld   = entry_l1sm_is_wait_ppn
-&&  pfu_get_ppn_vld;
+ wire.entry_l1_pf_ppn_up_vld   := (entry_l1_state.asUInt === args.L1_WAIT_PPN.asUInt) &&  wire.pfu_get_ppn_vld
 
 //==========================================================
 //                 Some compare info
 //==========================================================
 // &Force("output","entry_l1_pf_va_sub_inst_new_va"); @272
-assign entry_l1_pf_va_sub_inst_new_va[`PA_WIDTH-1:0]  =
-entry_l1_pf_va[`PA_WIDTH-1:0]
-- entry_inst_new_va[`PA_WIDTH-1:0];
+  wire.entry_l1_pf_va_sub_inst_new_va(PA_WIDTH-1,0)  := io.entry_l1_pf_va(PA_WIDTH-1,0) - io.entry_inst_new_va(PA_WIDTH-1,0)
 
-assign entry_l1sm_diff_sub_dist_strideh[`PA_WIDTH-1:0] =
-entry_l1_pf_va_sub_inst_new_va[`PA_WIDTH-1:0]
-- entry_l1_dist_strideh[`PA_WIDTH-1:0];
+  wire.entry_l1sm_diff_sub_dist_strideh(PA_WIDTH-1,0) := io.entry_l1_pf_va_sub_inst_new_va(PA_WIDTH-1,0) - io.entry_l1_dist_strideh(PA_WIDTH-1,0)
 
-assign entry_l1_pf_va_eq_inst_new_va = !(|entry_l1_pf_va_sub_inst_new_va[`PA_WIDTH-1:0]);
+  wire.entry_l1_pf_va_eq_inst_new_va := !io.entry_l1_pf_va_sub_inst_new_va(PA_WIDTH-1,0).orR //注意这里容易错，！对于UInt来说，是检测UInt是否为0，如果为0则返回1
 
-assign entry_inst_new_va_surpass_l1_pf_va_set = (entry_stride_neg ^ entry_l1_pf_va_sub_inst_new_va[`PA_WIDTH-1])
-&& !entry_l1_pf_va_eq_inst_new_va;
+  wire.entry_inst_new_va_surpass_l1_pf_va_set := (wire.entry_stride_neg ^ wire.entry_l1_pf_va_sub_inst_new_va(PA_WIDTH-1)).asBool && !wire.entry_l1_pf_va_eq_inst_new_va
 
-assign entry_in_l1_pf_region_set  = entry_stride_neg ^ entry_l1sm_diff_sub_dist_strideh[`PA_WIDTH-1];
+  wire.entry_in_l1_pf_region_set  := wire.entry_stride_neg ^ wire.entry_l1sm_diff_sub_dist_strideh(PA_WIDTH-1)
 
 //==========================================================
 //                    Reinit req
 //==========================================================
-assign entry_l1sm_reinit_req  = entry_l1sm_va_can_cmp
-&&  entry_inst_new_va_surpass_l1_pf_va;
+
 
 }
