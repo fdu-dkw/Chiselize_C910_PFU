@@ -748,4 +748,191 @@ val x_lsu_pfu_biu_pe_gated_clk = Module(new gated_clk_cell)
 //else create siganl to evict entry,
 //else create fail
 // &CombBeg; @108
+
+always @( pfu_pmb_entry_vld[7:0]) //条目里有东西了，最高空位生成指针
+begin
+pfu_pmb_empty_create_ptr[PMB_ENTRY-1:0]   = {PMB_ENTRY{1'b0}};
+casez(pfu_pmb_entry_vld[PMB_ENTRY-1:0])
+  8'b????_???0:pfu_pmb_empty_create_ptr(0)  = 1'b1;
+  8'b????_??01:pfu_pmb_empty_create_ptr[1]  = 1'b1;
+  8'b????_?011:pfu_pmb_empty_create_ptr[2]  = 1'b1;
+  8'b????_0111:pfu_pmb_empty_create_ptr[3]  = 1'b1;
+  8'b???0_1111:pfu_pmb_empty_create_ptr[4]  = 1'b1;
+  8'b??01_1111:pfu_pmb_empty_create_ptr[5]  = 1'b1;
+  8'b?011_1111:pfu_pmb_empty_create_ptr[6]  = 1'b1;
+  8'b0111_1111:pfu_pmb_empty_create_ptr[7]  = 1'b1;
+  default:pfu_pmb_empty_create_ptr[PMB_ENTRY-1:0]   = {PMB_ENTRY{1'b0}};
+endcase
+// &CombEnd; @121
+end
+
+// &CombBeg; @123
+always @( pfu_pmb_entry_evict[7:0])//最高满位生成指针
+begin
+pfu_pmb_evict_create_ptr[PMB_ENTRY-1:0]  = {PMB_ENTRY{1'b0}};
+casez(pfu_pmb_entry_evict[PMB_ENTRY-1:0])
+  8'b????_???1:pfu_pmb_evict_create_ptr(0)  = 1'b1;
+  8'b????_??10:pfu_pmb_evict_create_ptr[1]  = 1'b1;
+  8'b????_?100:pfu_pmb_evict_create_ptr[2]  = 1'b1;
+  8'b????_1000:pfu_pmb_evict_create_ptr[3]  = 1'b1;
+  8'b???1_0000:pfu_pmb_evict_create_ptr[4]  = 1'b1;
+  8'b??10_0000:pfu_pmb_evict_create_ptr[5]  = 1'b1;
+  8'b?100_0000:pfu_pmb_evict_create_ptr[6]  = 1'b1;
+  8'b1000_0000:pfu_pmb_evict_create_ptr[7]  = 1'b1;
+  default:pfu_pmb_evict_create_ptr[PMB_ENTRY-1:0]  = {PMB_ENTRY{1'b0}};
+endcase
+// &CombEnd; @136
+end
+
+ pfu_pmb_full = pfu_pmb_entry_vld.andR
+  pfu_pmb_create_ptr  =  pfu_pmb_empty_create_ptr
+  when(  pfu_pmb_full === 1.U) {
+    pfu_pmb_create_ptr := pfu_pmb_evict_create_ptr
+  }
+  
+  //==========================================================
+  //            pipe info create select
+  //==========================================================
+  //when ld and st create pmu simultaneously,ld has higher priority
+  pipe_create_pc = st_da_pc
+  when(ld_da_pfu_act_dp_vld === 1.U) {
+    pipe_create_pc := ld_da_ldfifo_pc
+  }
+
+  pipe_create_vld    = ld_da_pfu_act_vld | st_da_pfu_act_vld & !ld_da_pfu_act_dp_vld;
+
+  pipe_create_dp_vld = ld_da_pfu_act_dp_vld | st_da_pfu_act_dp_vld;
+
+  //------------------------hit pc----------------------------
+  pfu_pmb_hit_pc     = pfu_pmb_entry_hit_pc.orR
+  pfu_sdb_hit_pc     = pfu_sdb_entry_hit_pc.orR
+  pfu_pfb_hit_pc     = pfu_pfb_entry_hit_pc.orR
+  pfu_hit_pc         = pfu_pmb_hit_pc |  pfu_sdb_hit_pc |  pfu_pfb_hit_pc;
+  //-------------------create signal--------------------------
+  pfu_pmb_create_vld         = pipe_create_vld &  !pfu_hit_pc &  !pfu_gpfb_vld;
+  pfu_pmb_create_dp_vld      = pipe_create_dp_vld &  !pfu_hit_pc &  !pfu_gpfb_vld;
+  pfu_pmb_create_gateclk_en  = pipe_create_dp_vld &  !pfu_gpfb_vld;
+
+  pfu_pmb_entry_create_vld          := {PMB_ENTRY{pfu_pmb_create_vld}} & pfu_pmb_create_ptr
+  pfu_pmb_entry_create_dp_vld       := {PMB_ENTRY{pfu_pmb_create_dp_vld}} & pfu_pmb_create_ptr
+  pfu_pmb_entry_create_gateclk_en   := {PMB_ENTRY{pfu_pmb_create_gateclk_en}} & pfu_pmb_create_ptr;
+
+  //==========================================================
+  //                 Instance sdb entry
+  //==========================================================
+
+  // &ConnRule(s/_x$/(0)/); @182
+  // &ConnRule(s/_v$/_0/); @183
+  // &Instance("ct_lsu_pfu_sdb_entry","x_ct_lsu_pfu_sdb_entry_0"); @184
+  val x_ct_lsu_pfu_sdb_entry = VecInit(Seq.fill(2)(Module(new ct_lsu_pfu_sdb_entry).io))
+  x_ct_lsu_pfu_sdb_entry(0).amr_wa_cancel                     := io.amr_wa_cancel                     
+  x_ct_lsu_pfu_sdb_entry(0).cp0_lsu_icg_en                    := io.cp0_lsu_icg_en                    
+  x_ct_lsu_pfu_sdb_entry(0).cp0_lsu_l2_st_pref_en             := io.cp0_lsu_l2_st_pref_en             
+  x_ct_lsu_pfu_sdb_entry(0).cp0_yy_clk_en                     := io.cp0_yy_clk_en                     
+  x_ct_lsu_pfu_sdb_entry(0).cpurst_b                          := io.cpurst_b                          
+  x_ct_lsu_pfu_sdb_entry(0).ld_da_iid                         := io.ld_da_iid                         
+  x_ct_lsu_pfu_sdb_entry(0).ld_da_ldfifo_pc                   := io.ld_da_ldfifo_pc                   
+  x_ct_lsu_pfu_sdb_entry(0).ld_da_pfu_act_dp_vld              := io.ld_da_pfu_act_dp_vld              
+  x_ct_lsu_pfu_sdb_entry(0).ld_da_pfu_evict_cnt_vld           := io.ld_da_pfu_evict_cnt_vld           
+  x_ct_lsu_pfu_sdb_entry(0).ld_da_pfu_pf_inst_vld             := io.ld_da_pfu_pf_inst_vld             
+  x_ct_lsu_pfu_sdb_entry(0).ld_da_ppfu_va                     := io.ld_da_ppfu_va                     
+  x_ct_lsu_pfu_sdb_entry(0).lsu_special_clk                   := io.lsu_special_clk                   
+  x_ct_lsu_pfu_sdb_entry(0).pad_yy_icg_scan_en                := io.pad_yy_icg_scan_en                
+  pfu_pop_all_part_vld :=               x_ct_lsu_pfu_sdb_entry(0).pfu_pop_all_part_vld              
+  pfu_sdb_create_pc :=                  x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_create_pc                 
+  pfu_sdb_create_type_ld :=             x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_create_type_ld            
+  pfu_sdb_entry_create_dp_vld(0) :=     x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_create_dp_vld_x    
+  pfu_sdb_entry_create_gateclk_en(0):=  x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_create_gateclk_en_x
+  pfu_sdb_entry_create_vld(0) :=        x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_create_vld_x        
+  pfu_sdb_entry_evict(0) :=             x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_evict_x            
+  pfu_sdb_entry_hit_pc(0) :=            x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_hit_pc_x           
+  pfu_sdb_entry_pc_0 :=                 x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_pc_v                
+  pfu_sdb_entry_ready_grnt(0) :=        x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_ready_grnt_x       
+  pfu_sdb_entry_ready(0) :=             x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_ready_x            
+  pfu_sdb_entry_stride_neg(0) :=        x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_stride_neg_x        
+  pfu_sdb_entry_stride_0 :=             x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_stride_v            
+  pfu_sdb_entry_strideh_6to0_0 :=       x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_strideh_6to0_v      
+  pfu_sdb_entry_type_ld(0) :=           x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_type_ld_x           
+  pfu_sdb_entry_vld(0) :=               x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_vld_x              
+  x_ct_lsu_pfu_sdb_entry(0).rtu_yy_xx_commit0                 := io.rtu_yy_xx_commit0                 
+  x_ct_lsu_pfu_sdb_entry(0).rtu_yy_xx_commit0_iid             := io.rtu_yy_xx_commit0_iid             
+  x_ct_lsu_pfu_sdb_entry(0).rtu_yy_xx_commit1                 := io.rtu_yy_xx_commit1                 
+  x_ct_lsu_pfu_sdb_entry(0).rtu_yy_xx_commit1_iid             := io.rtu_yy_xx_commit1_iid             
+  x_ct_lsu_pfu_sdb_entry(0).rtu_yy_xx_commit2                 := io.rtu_yy_xx_commit2                 
+  x_ct_lsu_pfu_sdb_entry(0).rtu_yy_xx_commit2_iid             := io.rtu_yy_xx_commit2_iid             
+  x_ct_lsu_pfu_sdb_entry(0).rtu_yy_xx_flush                   := io.rtu_yy_xx_flush                   
+  sdb_timeout_cnt_val  := x_ct_lsu_pfu_sdb_entry(0).sdb_timeout_cnt_val              
+  x_ct_lsu_pfu_sdb_entry(0).st_da_iid                         := io.st_da_iid                         
+  x_ct_lsu_pfu_sdb_entry(0).st_da_pc                          := io.st_da_pc                          
+  x_ct_lsu_pfu_sdb_entry(0).st_da_pfu_evict_cnt_vld           := io.st_da_pfu_evict_cnt_vld           
+  x_ct_lsu_pfu_sdb_entry(0).st_da_pfu_pf_inst_vld             := io.st_da_pfu_pf_inst_vld             
+  x_ct_lsu_pfu_sdb_entry(0).st_da_ppfu_va                     := io.st_da_ppfu_va       
+
+// &ConnRule(s/_x$/[1]/); @186
+// &ConnRule(s/_v$/_1/); @187
+// &Instance("ct_lsu_pfu_sdb_entry","x_ct_lsu_pfu_sdb_entry_1"); @188       
+  x_ct_lsu_pfu_sdb_entry(1).amr_wa_cancel                     := io.amr_wa_cancel                     
+  x_ct_lsu_pfu_sdb_entry(1).cp0_lsu_icg_en                    := io.cp0_lsu_icg_en                    
+  x_ct_lsu_pfu_sdb_entry(1).cp0_lsu_l2_st_pref_en             := io.cp0_lsu_l2_st_pref_en             
+  x_ct_lsu_pfu_sdb_entry(1).cp0_yy_clk_en                     := io.cp0_yy_clk_en                     
+  x_ct_lsu_pfu_sdb_entry(1).cpurst_b                          := io.cpurst_b                          
+  x_ct_lsu_pfu_sdb_entry(1).ld_da_iid                         := io.ld_da_iid                         
+  x_ct_lsu_pfu_sdb_entry(1).ld_da_ldfifo_pc                   := io.ld_da_ldfifo_pc                   
+  x_ct_lsu_pfu_sdb_entry(1).ld_da_pfu_act_dp_vld              := io.ld_da_pfu_act_dp_vld              
+  x_ct_lsu_pfu_sdb_entry(1).ld_da_pfu_evict_cnt_vld           := io.ld_da_pfu_evict_cnt_vld           
+  x_ct_lsu_pfu_sdb_entry(1).ld_da_pfu_pf_inst_vld             := io.ld_da_pfu_pf_inst_vld             
+  x_ct_lsu_pfu_sdb_entry(1).ld_da_ppfu_va                     := io.ld_da_ppfu_va                     
+  x_ct_lsu_pfu_sdb_entry(1).lsu_special_clk                   := io.lsu_special_clk                   
+  x_ct_lsu_pfu_sdb_entry(1).pad_yy_icg_scan_en                := io.pad_yy_icg_scan_en                
+  pfu_pop_all_part_vld :=               x_ct_lsu_pfu_sdb_entry(1).pfu_pop_all_part_vld              
+  pfu_sdb_create_pc :=                  x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_create_pc                 
+  pfu_sdb_create_type_ld :=             x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_create_type_ld            
+  pfu_sdb_entry_create_dp_vld(1) :=     x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_create_dp_vld_x    
+  pfu_sdb_entry_create_gateclk_en(1):=  x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_create_gateclk_en_x
+  pfu_sdb_entry_create_vld(1) :=        x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_create_vld_x        
+  pfu_sdb_entry_evict(1) :=             x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_evict_x            
+  pfu_sdb_entry_hit_pc(1) :=            x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_hit_pc_x           
+  pfu_sdb_entry_pc_1 :=                 x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_pc_v                
+  pfu_sdb_entry_ready_grnt(1) :=        x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_ready_grnt_x       
+  pfu_sdb_entry_ready(1) :=             x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_ready_x            
+  pfu_sdb_entry_stride_neg(1) :=        x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_stride_neg_x        
+  pfu_sdb_entry_stride_1 :=             x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_stride_v            
+  pfu_sdb_entry_strideh_6to0_1 :=       x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_strideh_6to0_v      
+  pfu_sdb_entry_type_ld(1) :=           x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_type_ld_x           
+  pfu_sdb_entry_vld(1) :=               x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_vld_x              
+  x_ct_lsu_pfu_sdb_entry(1).rtu_yy_xx_commit0                 := io.rtu_yy_xx_commit0                 
+  x_ct_lsu_pfu_sdb_entry(1).rtu_yy_xx_commit0_iid             := io.rtu_yy_xx_commit0_iid             
+  x_ct_lsu_pfu_sdb_entry(1).rtu_yy_xx_commit1                 := io.rtu_yy_xx_commit1                 
+  x_ct_lsu_pfu_sdb_entry(1).rtu_yy_xx_commit1_iid             := io.rtu_yy_xx_commit1_iid             
+  x_ct_lsu_pfu_sdb_entry(1).rtu_yy_xx_commit2                 := io.rtu_yy_xx_commit2                 
+  x_ct_lsu_pfu_sdb_entry(1).rtu_yy_xx_commit2_iid             := io.rtu_yy_xx_commit2_iid             
+  x_ct_lsu_pfu_sdb_entry(1).rtu_yy_xx_flush                   := io.rtu_yy_xx_flush                   
+  sdb_timeout_cnt_val  := x_ct_lsu_pfu_sdb_entry(1).sdb_timeout_cnt_val              
+  x_ct_lsu_pfu_sdb_entry(1).st_da_iid                         := io.st_da_iid                         
+  x_ct_lsu_pfu_sdb_entry(1).st_da_pc                          := io.st_da_pc                          
+  x_ct_lsu_pfu_sdb_entry(1).st_da_pfu_evict_cnt_vld           := io.st_da_pfu_evict_cnt_vld           
+  x_ct_lsu_pfu_sdb_entry(1).st_da_pfu_pf_inst_vld             := io.st_da_pfu_pf_inst_vld             
+  x_ct_lsu_pfu_sdb_entry(1).st_da_ppfu_va                     := io.st_da_ppfu_va    
+
+  //==========================================================
+//            Generate full/create signal of sdb
+//==========================================================
+//------------------pop pointer of pmb----------------------
+// &CombBeg; @194      
+always @( pfu_pmb_entry_ready[7:0])
+begin
+pfu_pmb_pop_ptr[PMB_ENTRY-1:0]  = {PMB_ENTRY{1'b0}};
+casez(pfu_pmb_entry_ready[PMB_ENTRY-1:0])
+  8'b????_???1:pfu_pmb_pop_ptr[0]  = 1'b1;
+  8'b????_??10:pfu_pmb_pop_ptr[1]  = 1'b1;
+  8'b????_?100:pfu_pmb_pop_ptr[2]  = 1'b1;
+  8'b????_1000:pfu_pmb_pop_ptr[3]  = 1'b1;
+  8'b???1_0000:pfu_pmb_pop_ptr[4]  = 1'b1;
+  8'b??10_0000:pfu_pmb_pop_ptr[5]  = 1'b1;
+  8'b?100_0000:pfu_pmb_pop_ptr[6]  = 1'b1;
+  8'b1000_0000:pfu_pmb_pop_ptr[7]  = 1'b1;
+  default:pfu_pmb_pop_ptr[PMB_ENTRY-1:0]  = {PMB_ENTRY{1'b0}};
+endcase
+// &CombEnd; @207
+end
 }
