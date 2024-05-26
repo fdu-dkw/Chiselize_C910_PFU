@@ -438,17 +438,17 @@ class ct_lsu_pfu() extends Module {
 
   val x_ct_lsu_pfu_pmb_entry = VecInit(Seq.fill(8)(Module(new ct_lsu_pfu_pmb_entry).io));
   for (i <- 0 to 7) {
-    x_ct_lsu_pfu_pmb_entry(i).amr_wa_cancel := io.amr_wa_cancel
-    x_ct_lsu_pfu_pmb_entry(i).cp0_lsu_icg_en := io.cp0_lsu_icg_en
-    x_ct_lsu_pfu_pmb_entry(i).cp0_lsu_l2_st_pref_en := io.cp0_lsu_l2_st_pref_en
-    x_ct_lsu_pfu_pmb_entry(i).cp0_yy_clk_en := io.cp0_yy_clk_en
-    x_ct_lsu_pfu_pmb_entry(i).cpurst_b := io.cpurst_b
-    x_ct_lsu_pfu_pmb_entry(i).ld_da_ldfifo_pc := io.ld_da_ldfifo_pc
-    x_ct_lsu_pfu_pmb_entry(i).ld_da_pfu_act_dp_vld := io.ld_da_pfu_act_dp_vld
-    x_ct_lsu_pfu_pmb_entry(i).ld_da_pfu_evict_cnt_vld := io.ld_da_pfu_evict_cnt_vld
-    x_ct_lsu_pfu_pmb_entry(i).ld_da_pfu_pf_inst_vld := io.ld_da_pfu_pf_inst_vld
-    x_ct_lsu_pfu_pmb_entry(i).lsu_special_clk := io.lsu_special_clk
-    x_ct_lsu_pfu_pmb_entry(i).pad_yy_icg_scan_en := io.pad_yy_icg_scan_en
+    // x_ct_lsu_pfu_pmb_entry(i).amr_wa_cancel := io.amr_wa_cancel
+    // x_ct_lsu_pfu_pmb_entry(i).cp0_lsu_icg_en := io.cp0_lsu_icg_en
+    // x_ct_lsu_pfu_pmb_entry(i).cp0_lsu_l2_st_pref_en := io.cp0_lsu_l2_st_pref_en
+    // x_ct_lsu_pfu_pmb_entry(i).cp0_yy_clk_en := io.cp0_yy_clk_en
+    // x_ct_lsu_pfu_pmb_entry(i).cpurst_b := io.cpurst_b
+    // x_ct_lsu_pfu_pmb_entry(i).ld_da_ldfifo_pc := io.ld_da_ldfifo_pc
+    // x_ct_lsu_pfu_pmb_entry(i).ld_da_pfu_act_dp_vld := io.ld_da_pfu_act_dp_vld
+    // x_ct_lsu_pfu_pmb_entry(i).ld_da_pfu_evict_cnt_vld := io.ld_da_pfu_evict_cnt_vld
+    // x_ct_lsu_pfu_pmb_entry(i).ld_da_pfu_pf_inst_vld := io.ld_da_pfu_pf_inst_vld
+    // x_ct_lsu_pfu_pmb_entry(i).lsu_special_clk := io.lsu_special_clk
+    // x_ct_lsu_pfu_pmb_entry(i).pad_yy_icg_scan_en := io.pad_yy_icg_scan_en
     pfu_pmb_entry_create_dp_vld(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_create_dp_vld_x
     pfu_pmb_entry_create_gateclk_en(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_create_gateclk_en_x
     pfu_pmb_entry_create_vld(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_create_vld_x
@@ -459,12 +459,13 @@ class ct_lsu_pfu() extends Module {
     pfu_pmb_entry_ready(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_ready_x
     pfu_pmb_entry_type_ld(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_type_ld_x
     pfu_pmb_entry_vld(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_vld_x
-    pfu_pop_all_part_vld := x_ct_lsu_pfu_pmb_entry(i).pfu_pop_all_part_vld
-    pipe_create_pc := x_ct_lsu_pfu_pmb_entry(i).pipe_create_pc
-    pmb_timeout_cnt_val := x_ct_lsu_pfu_pmb_entry(i).pmb_timeout_cnt_val
-    x_ct_lsu_pfu_pmb_entry(i).st_da_pc := io.st_da_pc
-    x_ct_lsu_pfu_pmb_entry(i).st_da_pfu_evict_cnt_vld := io.st_da_pfu_evict_cnt_vld
-    x_ct_lsu_pfu_pmb_entry(i).st_da_pfu_pf_inst_vld := io.st_da_pfu_pf_inst_vld
+    x_ct_lsu_pfu_pmb_entry(i) <> io
+    // pfu_pop_all_part_vld := x_ct_lsu_pfu_pmb_entry(i).pfu_pop_all_part_vld
+    // pipe_create_pc := x_ct_lsu_pfu_pmb_entry(i).pipe_create_pc
+    // pmb_timeout_cnt_val := x_ct_lsu_pfu_pmb_entry(i).pmb_timeout_cnt_val
+    // x_ct_lsu_pfu_pmb_entry(i).st_da_pc := io.st_da_pc
+    // x_ct_lsu_pfu_pmb_entry(i).st_da_pfu_evict_cnt_vld := io.st_da_pfu_evict_cnt_vld
+    // x_ct_lsu_pfu_pmb_entry(i).st_da_pfu_pf_inst_vld := io.st_da_pfu_pf_inst_vld
   }
 
   //==========================================================
@@ -475,66 +476,17 @@ class ct_lsu_pfu() extends Module {
   //else create siganl to evict entry,
   //else create fail
   // &CombBeg; @108
-  pfu_pmb_empty_create_ptr := 0
-  when(pfu_pmb_entry_vld(0) === 1.U) {
-    pfu_pmb_empty_create_ptr(0) := 1.U
-  }
-    .elsewhen(pfu_pmb_entry_vld(1) === 1.U) {
-      pfu_pmb_empty_create_ptr(1) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_vld(2) === 1.U) {
-      pfu_pmb_empty_create_ptr(2) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_vld(3) === 1.U) {
-      pfu_pmb_empty_create_ptr(3) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_vld(4) === 1.U) {
-      pfu_pmb_empty_create_ptr(4) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_vld(5) === 1.U) {
-      pfu_pmb_empty_create_ptr(5) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_vld(6) === 1.U) {
-      pfu_pmb_empty_create_ptr(6) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_vld(7) === 1.U) {
-      pfu_pmb_empty_create_ptr(7) := 1.U
-    }
-    .otherwise {
-      pfu_pmb_empty_create_ptr := 0.U
-    }
+  pfu_pmb_empty_create_ptr := MuxCase(default = 0.U(8.W), (0 to 7).map { i =>
+    pfu_pmb_entry_vld(i).asBool -> (1.U(8.W) << i)
+  })
   // &CombEnd; @121
 
 
   // &CombBeg; @123
-  pfu_pmb_evict_create_ptr := 0
-  when(pfu_pmb_entry_evict(0) === 1.U) {
-    pfu_pmb_evict_create_ptr(0) := 1.U
-  }
-    .elsewhen(pfu_pmb_entry_evict(1) === 1.U) {
-      pfu_pmb_evict_create_ptr(1) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_evict(2) === 1.U) {
-      pfu_pmb_evict_create_ptr(2) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_evict(3) === 1.U) {
-      pfu_pmb_evict_create_ptr(3) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_evict(4) === 1.U) {
-      pfu_pmb_evict_create_ptr(4) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_evict(5) === 1.U) {
-      pfu_pmb_evict_create_ptr(5) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_evict(6) === 1.U) {
-      pfu_pmb_evict_create_ptr(6) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_evict(7) === 1.U) {
-      pfu_pmb_evict_create_ptr(7) := 1.U
-    }
-    .otherwise {
-      pfu_pmb_evict_create_ptr := 0.U
-    }
+  pfu_pmb_evict_create_ptr := MuxCase(default = 0.U(8.W), (0 to 7).map { i =>
+    pfu_pmb_entry_evict(i).asBool -> (1.U(8.W) << i)
+  })
+
 
   pfu_pmb_full := pfu_pmb_entry_vld.asUInt.andR
   pfu_pmb_create_ptr := pfu_pmb_empty_create_ptr
@@ -565,9 +517,10 @@ class ct_lsu_pfu() extends Module {
   pfu_pmb_create_dp_vld := pipe_create_dp_vld & !pfu_hit_pc & !pfu_gpfb_vld;
   pfu_pmb_create_gateclk_en := pipe_create_dp_vld & !pfu_gpfb_vld;
 
-  pfu_pmb_entry_create_vld := (pfu_pmb_create_vld ## pfu_pmb_create_vld ## pfu_pmb_create_vld ## pfu_pmb_create_vld ## pfu_pmb_create_vld ## pfu_pmb_create_vld ## pfu_pmb_create_vld ## pfu_pmb_create_vld) & pfu_pmb_create_ptr
-  pfu_pmb_entry_create_dp_vld := (pfu_pmb_create_dp_vld ## pfu_pmb_create_dp_vld ## pfu_pmb_create_dp_vld ## pfu_pmb_create_dp_vld ## pfu_pmb_create_dp_vld ## pfu_pmb_create_dp_vld ## pfu_pmb_create_dp_vld ## pfu_pmb_create_dp_vld) & pfu_pmb_create_ptr
-  pfu_pmb_entry_create_gateclk_en := (pfu_pmb_create_gateclk_en ## pfu_pmb_create_gateclk_en ## pfu_pmb_create_gateclk_en ## pfu_pmb_create_gateclk_en ## pfu_pmb_create_gateclk_en ## pfu_pmb_create_gateclk_en ## pfu_pmb_create_gateclk_en ## pfu_pmb_create_gateclk_en) & pfu_pmb_create_ptr;
+  pfu_pmb_entry_create_vld := Seq.fill(8)(pfu_pmb_create_vld).reduce(_ ## _) & pfu_pmb_create_ptr
+  pfu_pmb_entry_create_dp_vld := Seq.fill(8)(pfu_pmb_create_dp_vld).reduce(_ ## _) & pfu_pmb_create_ptr
+  pfu_pmb_entry_create_gateclk_en := Seq.fill(8)(pfu_pmb_create_gateclk_en).reduce(_ ## _) & pfu_pmb_create_ptr
+
 
   //==========================================================
   //                 Instance sdb entry
@@ -670,37 +623,9 @@ class ct_lsu_pfu() extends Module {
   //            Generate full/create signal of sdb
   //==========================================================
   //------------------pop pointer of pmb----------------------
-  // &CombBeg; @194
-  pfu_pmb_pop_ptr := MuxCase(default = 0.U(8.W), (0 to 7).map(i => pfu_pmb_entry_ready(i).asBool -> (1.U(8.W) << i)))
-//  pfu_pmb_pop_ptr := 0.U
-//  when(pfu_pmb_entry_ready(0) === 1.U) {
-//    pfu_pmb_pop_ptr(0) := 1.U
-//  }
-//  .elsewhen(pfu_pmb_entry_ready(1) === 1.U) {
-//    pfu_pmb_pop_ptr(1) := 1.U
-//  }
-//  .elsewhen(pfu_pmb_entry_ready(2) === 1.U) {
-//    pfu_pmb_pop_ptr(2) := 1.U
-//  }
-//  .elsewhen(pfu_pmb_entry_ready(3) === 1.U) {
-//    pfu_pmb_pop_ptr(3) := 1.U
-//  }
-//  .elsewhen(pfu_pmb_entry_ready(4) === 1.U) {
-//    pfu_pmb_pop_ptr(4) := 1.U
-//  }
-//  .elsewhen(pfu_pmb_entry_ready(5) === 1.U) {
-//    pfu_pmb_pop_ptr(5) := 1.U
-//  }
-//  .elsewhen(pfu_pmb_entry_ready(6) === 1.U) {
-//    pfu_pmb_pop_ptr(6) := 1.U
-//  }
-//  .elsewhen(pfu_pmb_entry_ready(7) === 1.U) {
-//    pfu_pmb_pop_ptr(7) := 1.U
-//  }
-//  .otherwise {
-//    pfu_pmb_pop_ptr := 0.U
-//  }
-  // &CombEnd; @207
+  pfu_pmb_pop_ptr := MuxCase(default = 0.U(8.W), (0 to 7).map { i =>
+    pfu_pmb_entry_ready(i).asBool -> (1.U(8.W) << i)
+  })
 
   pfu_sdb_create_pc := (0 to 7).map { i =>
     Seq.fill(15)(pfu_pmb_pop_ptr(i)).reduce(_ ## _) & pfu_pmb_entry_pc(i)
@@ -710,33 +635,18 @@ class ct_lsu_pfu() extends Module {
 
   //---------------------create pointer-----------------------
   //if it has empty entry, then create signal to empty entry,
-  //else create siganl to evict entry,
+  //else create signal to evict entry,
   //else wait
-  // &CombBeg; @225
+  pfu_sdb_empty_create_ptr := MuxCase(0.U(2.W), Seq(
+    (pfu_sdb_entry_vld(0) === 0.U) -> 1.U(2.W),
+    (pfu_sdb_entry_vld(1) === 0.U) -> 2.U(2.W)
+  ))
 
-  pfu_sdb_empty_create_ptr := 0.U
-  when(pfu_sdb_entry_vld(0) === 0.U) {
-    pfu_sdb_empty_create_ptr(0) := 1.U
-  }
-    .elsewhen(pfu_sdb_entry_vld(1) === 0.U) {
-      pfu_sdb_empty_create_ptr(1) := 1.U
-    }
-    .otherwise {
-      pfu_sdb_empty_create_ptr := 0
-    }
-  // &CombEnd; @232
+  pfu_sdb_evict_create_ptr := MuxCase(0.U(2.W), Seq(
+    (pfu_sdb_entry_evict(0) === 0.U) -> 1.U(2.W),
+    (pfu_sdb_entry_evict(1) === 0.U) -> 2.U(2.W)
+  ))
 
-  pfu_sdb_evict_create_ptr := 0.U
-  when(pfu_sdb_entry_evict(0) === 0.U) {
-    pfu_sdb_evict_create_ptr(0) := 1.U
-  }
-    .elsewhen(pfu_sdb_entry_evict(1) === 0.U) {
-      pfu_sdb_evict_create_ptr(1) := 1.U
-    }
-    .otherwise {
-      pfu_sdb_evict_create_ptr := 0
-    }
-  // &CombEnd; @241
 
   pfu_sdb_full := pfu_sdb_entry_vld.asUInt.andR
   pfu_sdb_has_evict := pfu_sdb_entry_evict.asUInt.orR
@@ -767,42 +677,43 @@ class ct_lsu_pfu() extends Module {
   // &Instance("ct_lsu_pfu_pfb_entry","x_ct_lsu_pfu_pfb_entry_0"); @273
   val x_ct_lsu_pfu_pfb_entry = VecInit(Seq.fill(8)(Module(new ct_lsu_pfu_pfb_entry).io));
   for (i <- 0 to 7) {
-    ct_lsu_pfu_pfb_entry(i).amr_wa_cancel := io.amr_wa_cancel
-    ct_lsu_pfu_pfb_entry(i).cp0_lsu_icg_en := io.cp0_lsu_icg_en
-    ct_lsu_pfu_pfb_entry(i).cp0_lsu_l2_st_pref_en := io.cp0_lsu_l2_st_pref_en
-    ct_lsu_pfu_pfb_entry(i).cp0_lsu_pfu_mmu_dis := io.cp0_lsu_pfu_mmu_dis
-    ct_lsu_pfu_pfb_entry(i).cp0_yy_clk_en := io.cp0_yy_clk_en
-    ct_lsu_pfu_pfb_entry(i).cp0_yy_priv_mode := io.cp0_yy_priv_mode
-    ct_lsu_pfu_pfb_entry(i).cpurst_b := io.cpurst_b
-    ct_lsu_pfu_pfb_entry(i).ld_da_ldfifo_pc := io.ld_da_ldfifo_pc
-    ct_lsu_pfu_pfb_entry(i).ld_da_page_sec_ff := io.ld_da_page_sec_ff
-    ct_lsu_pfu_pfb_entry(i).ld_da_page_share_ff := io.ld_da_page_share_ff
-    ct_lsu_pfu_pfb_entry(i).ld_da_pfu_act_dp_vld := io.ld_da_pfu_act_dp_vld
-    ct_lsu_pfu_pfb_entry(i).ld_da_pfu_act_vld := io.ld_da_pfu_act_vld
-    ct_lsu_pfu_pfb_entry(i).ld_da_pfu_evict_cnt_vld := io.ld_da_pfu_evict_cnt_vld
-    ct_lsu_pfu_pfb_entry(i).ld_da_pfu_pf_inst_vld := io.ld_da_pfu_pf_inst_vld
-    ct_lsu_pfu_pfb_entry(i).ld_da_ppfu_va := io.ld_da_ppfu_va
-    ct_lsu_pfu_pfb_entry(i).ld_da_ppn_ff := io.ld_da_ppn_ff
-    ct_lsu_pfu_pfb_entry(i).lsu_pfu_l1_dist_sel := io.lsu_pfu_l1_dist_sel
-    ct_lsu_pfu_pfb_entry(i).lsu_pfu_l2_dist_sel := io.lsu_pfu_l2_dist_sel
-    ct_lsu_pfu_pfb_entry(i).lsu_special_clk := io.lsu_special_clk
-    ct_lsu_pfu_pfb_entry(i).pad_yy_icg_scan_en := io.pad_yy_icg_scan_en
-    io.pfb_no_req_cnt_val := ct_lsu_pfu_pfb_entry(i).pfb_no_req_cnt_val
-    io.pfb_timeout_cnt_val := ct_lsu_pfu_pfb_entry(i).pfb_timeout_cnt_val
-    io.pfu_biu_pe_req_sel_l1 := ct_lsu_pfu_pfb_entry(i).pfu_biu_pe_req_sel_l1
-    io.pfu_dcache_pref_en := ct_lsu_pfu_pfb_entry(i).pfu_dcache_pref_en
-    io.pfu_get_page_sec := ct_lsu_pfu_pfb_entry(i).pfu_get_page_sec
-    io.pfu_get_page_share := ct_lsu_pfu_pfb_entry(i).pfu_get_page_share
-    io.pfu_get_ppn := ct_lsu_pfu_pfb_entry(i).pfu_get_ppn
-    io.pfu_get_ppn_err := ct_lsu_pfu_pfb_entry(i).pfu_get_ppn_err
-    io.pfu_get_ppn_vld := ct_lsu_pfu_pfb_entry(i).pfu_get_ppn_vld
-    io.pfu_l2_pref_en := ct_lsu_pfu_pfb_entry(i).pfu_l2_pref_en
-    io.pfu_mmu_pe_req_sel_l1 := ct_lsu_pfu_pfb_entry(i).pfu_mmu_pe_req_sel_l1
-    io.pfu_pfb_create_pc := ct_lsu_pfu_pfb_entry(i).pfu_pfb_create_pc
-    io.pfu_pfb_create_stride := ct_lsu_pfu_pfb_entry(i).pfu_pfb_create_stride
-    io.pfu_pfb_create_stride_neg := ct_lsu_pfu_pfb_entry(i).pfu_pfb_create_stride_neg
-    io.pfu_pfb_create_strideh_6to0 := ct_lsu_pfu_pfb_entry(i).pfu_pfb_create_strideh_6to0
-    io.pfu_pfb_create_type_ld := ct_lsu_pfu_pfb_entry(i).pfu_pfb_create_type_ld
+    // ct_lsu_pfu_pfb_entry(i).amr_wa_cancel := io.amr_wa_cancel
+    // ct_lsu_pfu_pfb_entry(i).cp0_lsu_icg_en := io.cp0_lsu_icg_en
+    // ct_lsu_pfu_pfb_entry(i).cp0_lsu_l2_st_pref_en := io.cp0_lsu_l2_st_pref_en
+    // ct_lsu_pfu_pfb_entry(i).cp0_lsu_pfu_mmu_dis := io.cp0_lsu_pfu_mmu_dis
+    // ct_lsu_pfu_pfb_entry(i).cp0_yy_clk_en := io.cp0_yy_clk_en
+    // ct_lsu_pfu_pfb_entry(i).cp0_yy_priv_mode := io.cp0_yy_priv_mode
+    // ct_lsu_pfu_pfb_entry(i).cpurst_b := io.cpurst_b
+    // ct_lsu_pfu_pfb_entry(i).ld_da_ldfifo_pc := io.ld_da_ldfifo_pc
+    // ct_lsu_pfu_pfb_entry(i).ld_da_page_sec_ff := io.ld_da_page_sec_ff
+    // ct_lsu_pfu_pfb_entry(i).ld_da_page_share_ff := io.ld_da_page_share_ff
+    // ct_lsu_pfu_pfb_entry(i).ld_da_pfu_act_dp_vld := io.ld_da_pfu_act_dp_vld
+    // ct_lsu_pfu_pfb_entry(i).ld_da_pfu_act_vld := io.ld_da_pfu_act_vld
+    // ct_lsu_pfu_pfb_entry(i).ld_da_pfu_evict_cnt_vld := io.ld_da_pfu_evict_cnt_vld
+    // ct_lsu_pfu_pfb_entry(i).ld_da_pfu_pf_inst_vld := io.ld_da_pfu_pf_inst_vld
+    // ct_lsu_pfu_pfb_entry(i).ld_da_ppfu_va := io.ld_da_ppfu_va
+    // ct_lsu_pfu_pfb_entry(i).ld_da_ppn_ff := io.ld_da_ppn_ff
+    // ct_lsu_pfu_pfb_entry(i).lsu_pfu_l1_dist_sel := io.lsu_pfu_l1_dist_sel
+    // ct_lsu_pfu_pfb_entry(i).lsu_pfu_l2_dist_sel := io.lsu_pfu_l2_dist_sel
+    // ct_lsu_pfu_pfb_entry(i).lsu_special_clk := io.lsu_special_clk
+    // ct_lsu_pfu_pfb_entry(i).pad_yy_icg_scan_en := io.pad_yy_icg_scan_en
+    // io.pfb_no_req_cnt_val := ct_lsu_pfu_pfb_entry(i).pfb_no_req_cnt_val
+    // io.pfb_timeout_cnt_val := ct_lsu_pfu_pfb_entry(i).pfb_timeout_cnt_val
+    // io.pfu_biu_pe_req_sel_l1 := ct_lsu_pfu_pfb_entry(i).pfu_biu_pe_req_sel_l1
+    // io.pfu_dcache_pref_en := ct_lsu_pfu_pfb_entry(i).pfu_dcache_pref_en
+    // io.pfu_get_page_sec := ct_lsu_pfu_pfb_entry(i).pfu_get_page_sec
+    // io.pfu_get_page_share := ct_lsu_pfu_pfb_entry(i).pfu_get_page_share
+    // io.pfu_get_ppn := ct_lsu_pfu_pfb_entry(i).pfu_get_ppn
+    // io.pfu_get_ppn_err := ct_lsu_pfu_pfb_entry(i).pfu_get_ppn_err
+    // io.pfu_get_ppn_vld := ct_lsu_pfu_pfb_entry(i).pfu_get_ppn_vld
+    // io.pfu_l2_pref_en := ct_lsu_pfu_pfb_entry(i).pfu_l2_pref_en
+    // io.pfu_mmu_pe_req_sel_l1 := ct_lsu_pfu_pfb_entry(i).pfu_mmu_pe_req_sel_l1
+    // io.pfu_pfb_create_pc := ct_lsu_pfu_pfb_entry(i).pfu_pfb_create_pc
+    // io.pfu_pfb_create_stride := ct_lsu_pfu_pfb_entry(i).pfu_pfb_create_stride
+    // io.pfu_pfb_create_stride_neg := ct_lsu_pfu_pfb_entry(i).pfu_pfb_create_stride_neg
+    // io.pfu_pfb_create_strideh_6to0 := ct_lsu_pfu_pfb_entry(i).pfu_pfb_create_strideh_6to0
+    // io.pfu_pfb_create_type_ld := ct_lsu_pfu_pfb_entry(i).pfu_pfb_create_type_ld
+
     io.pfu_pfb_entry_biu_pe_req_grnt(i) := ct_lsu_pfu_pfb_entry(i).pfu_pfb_entry_biu_pe_req_grnt_x
     io.pfu_pfb_entry_biu_pe_req_src(i) := ct_lsu_pfu_pfb_entry(i).pfu_pfb_entry_biu_pe_req_src_v
     io.pfu_pfb_entry_biu_pe_req(i) := ct_lsu_pfu_pfb_entry(i).pfu_pfb_entry_biu_pe_req_x
@@ -827,14 +738,16 @@ class ct_lsu_pfu() extends Module {
     io.pfu_pfb_entry_priv_mode(i) := ct_lsu_pfu_pfb_entry(i).pfu_pfb_entry_priv_mode_v
     io.pfu_pfb_entry_vld(i) := ct_lsu_pfu_pfb_entry(i).pfu_pfb_entry_vld_x
     io.pfu_pop_all_part_vld := ct_lsu_pfu_pfb_entry(i).pfu_pop_all_part_vld
-    ct_lsu_pfu_pfb_entry(i).st_da_page_sec_ff := io.st_da_page_sec_ff
-    ct_lsu_pfu_pfb_entry(i).st_da_page_share_ff := io.st_da_page_share_ff
-    ct_lsu_pfu_pfb_entry(i).st_da_pc := io.st_da_pc
-    ct_lsu_pfu_pfb_entry(i).st_da_pfu_act_vld := io.st_da_pfu_act_vld
-    ct_lsu_pfu_pfb_entry(i).st_da_pfu_evict_cnt_vld := io.st_da_pfu_evict_cnt_vld
-    ct_lsu_pfu_pfb_entry(i).st_da_pfu_pf_inst_vld := io.st_da_pfu_pf_inst_vld
-    ct_lsu_pfu_pfb_entry(i).st_da_ppfu_va := io.st_da_ppfu_va
-    ct_lsu_pfu_pfb_entry(i).st_da_ppn_ff := io.st_da_ppn_ff
+    ct_lsu_pfu_pfb_entry(i) <> io
+
+    // ct_lsu_pfu_pfb_entry(i).st_da_page_sec_ff := io.st_da_page_sec_ff
+    // ct_lsu_pfu_pfb_entry(i).st_da_page_share_ff := io.st_da_page_share_ff
+    // ct_lsu_pfu_pfb_entry(i).st_da_pc := io.st_da_pc
+    // ct_lsu_pfu_pfb_entry(i).st_da_pfu_act_vld := io.st_da_pfu_act_vld
+    // ct_lsu_pfu_pfb_entry(i).st_da_pfu_evict_cnt_vld := io.st_da_pfu_evict_cnt_vld
+    // ct_lsu_pfu_pfb_entry(i).st_da_pfu_pf_inst_vld := io.st_da_pfu_pf_inst_vld
+    // ct_lsu_pfu_pfb_entry(i).st_da_ppfu_va := io.st_da_ppfu_va
+    // ct_lsu_pfu_pfb_entry(i).st_da_ppn_ff := io.st_da_ppn_ff
   }
 
   //==========================================================
