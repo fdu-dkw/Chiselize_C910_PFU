@@ -671,34 +671,35 @@ class ct_lsu_pfu() extends Module {
   //==========================================================
   //------------------pop pointer of pmb----------------------
   // &CombBeg; @194
-  pfu_pmb_pop_ptr := 0.U
-  when(pfu_pmb_entry_ready(0) === 1.U) {
-    pfu_pmb_pop_ptr(0) := 1.U
-  }
-    .elsewhen(pfu_pmb_entry_ready(1) === 1.U) {
-      pfu_pmb_pop_ptr(1) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_ready(2) === 1.U) {
-      pfu_pmb_pop_ptr(2) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_ready(3) === 1.U) {
-      pfu_pmb_pop_ptr(3) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_ready(4) === 1.U) {
-      pfu_pmb_pop_ptr(4) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_ready(5) === 1.U) {
-      pfu_pmb_pop_ptr(5) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_ready(6) === 1.U) {
-      pfu_pmb_pop_ptr(6) := 1.U
-    }
-    .elsewhen(pfu_pmb_entry_ready(7) === 1.U) {
-      pfu_pmb_pop_ptr(7) := 1.U
-    }
-    .otherwise {
-      pfu_pmb_pop_ptr := 0.U
-    }
+  pfu_pmb_pop_ptr := MuxCase(default = 0.U(8.W), (0 to 7).map(i => pfu_pmb_entry_ready(i).asBool -> (1.U(8.W) << i)))
+//  pfu_pmb_pop_ptr := 0.U
+//  when(pfu_pmb_entry_ready(0) === 1.U) {
+//    pfu_pmb_pop_ptr(0) := 1.U
+//  }
+//  .elsewhen(pfu_pmb_entry_ready(1) === 1.U) {
+//    pfu_pmb_pop_ptr(1) := 1.U
+//  }
+//  .elsewhen(pfu_pmb_entry_ready(2) === 1.U) {
+//    pfu_pmb_pop_ptr(2) := 1.U
+//  }
+//  .elsewhen(pfu_pmb_entry_ready(3) === 1.U) {
+//    pfu_pmb_pop_ptr(3) := 1.U
+//  }
+//  .elsewhen(pfu_pmb_entry_ready(4) === 1.U) {
+//    pfu_pmb_pop_ptr(4) := 1.U
+//  }
+//  .elsewhen(pfu_pmb_entry_ready(5) === 1.U) {
+//    pfu_pmb_pop_ptr(5) := 1.U
+//  }
+//  .elsewhen(pfu_pmb_entry_ready(6) === 1.U) {
+//    pfu_pmb_pop_ptr(6) := 1.U
+//  }
+//  .elsewhen(pfu_pmb_entry_ready(7) === 1.U) {
+//    pfu_pmb_pop_ptr(7) := 1.U
+//  }
+//  .otherwise {
+//    pfu_pmb_pop_ptr := 0.U
+//  }
   // &CombEnd; @207
 
   pfu_sdb_create_pc := (0 to 7).map { i =>
