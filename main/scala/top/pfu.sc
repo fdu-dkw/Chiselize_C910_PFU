@@ -39,7 +39,7 @@ class MyIO extends Bundle {
   val lfb_pfu_create_id = Input(UInt(5.W));
   val lfb_pfu_dcache_hit = Input(UInt(9.W));
   val lfb_pfu_dcache_miss = Input(UInt(9.W));
-  val lfb_pfu_rready_grnt = Input(UInt(1.W));
+  val lfb_pfu_rready_grnt = Input(Bool());
   val lm_pfu_biu_req_hit_idx = Input(UInt(1.W));
   val lsu_pfu_l1_dist_sel = Input(UInt(4.W));
   val lsu_pfu_l2_dist_sel = Input(UInt(4.W));
@@ -51,7 +51,7 @@ class MyIO extends Bundle {
   val mmu_lsu_share2 = Input(UInt(1.W));
   val pad_yy_icg_scan_en = Input(UInt(1.W));
   val rb_pfu_biu_req_hit_idx = Input(UInt(1.W));
-  val rb_pfu_nc_no_pending = Input(UInt(1.W));
+  val rb_pfu_nc_no_pending = Input(Bool());
   val rtu_yy_xx_commit0 = Input(UInt(1.W));
   val rtu_yy_xx_commit0_iid = Input(UInt(7.W));
   val rtu_yy_xx_commit1 = Input(UInt(1.W));
@@ -109,30 +109,30 @@ class ct_lsu_pfu() extends Module {
   val pfu_biu_pe_req_ptr_priority_0 = Reg(UInt(9.W));
   val pfu_biu_pe_req_ptr_priority_1 = Reg(UInt(9.W));
   val pfu_biu_req_addr_tto6 = Reg(UInt(34.W));
-  val pfu_biu_req_l1 = Reg(UInt(1.W));
+  val pfu_biu_req_l1 = Reg(Bool());
   val pfu_biu_req_page_sec = Reg(UInt(1.W));
   val pfu_biu_req_page_share = Reg(UInt(1.W));
   val pfu_biu_req_priority = Reg(UInt(9.W));
   val pfu_biu_req_priv_mode = Reg(UInt(2.W));
   val pfu_biu_req_ptr = Reg(UInt(9.W));
   val pfu_biu_req_unmask = Reg(Bool());
-  val pfu_mmu_pe_req_ptr = Reg(UInt(9.W));
-  val pfu_mmu_req = Reg(UInt(1.W));
+  val pfu_mmu_pe_req_ptr = Reg(Vec(9,UInt(1.W)));
+  val pfu_mmu_req = Reg(Bool());
   val pfu_mmu_req_l1 = Reg(UInt(1.W));
   val pfu_mmu_req_ptr = Reg(UInt(9.W));
   val pfu_mmu_req_vpn = Reg(UInt(28.W));
-  val pfu_pfb_empty_create_ptr = Reg(UInt(8.W));
+  val pfu_pfb_empty_create_ptr = Reg(Vec(8,UInt(1.W)));
   val pfu_pfb_evict_create_ptr = Reg(UInt(8.W));
   val pfu_pmb_empty_create_ptr = Reg(Vec(8, UInt(1.W)));
   val pfu_pmb_evict_create_ptr = Reg(Vec(8, UInt(1.W)));
   val pfu_pmb_pop_ptr = Reg(Vec(8, UInt(1.W)));
   val pfu_sdb_empty_create_ptr = Reg(Vec(2, UInt(1.W)));
   val pfu_sdb_evict_create_ptr = Reg(Vec(2, UInt(1.W)));
-  val pfu_sdb_pop_ptr = Reg(UInt(2.W));
+  val pfu_sdb_pop_ptr = Reg(Vec(2,UInt(1.W)));
 
   val amr_wa_cancel = Wire(UInt(1.W));
-  val bus_arb_pfu_ar_grnt = Wire(UInt(1.W));
-  val bus_arb_pfu_ar_ready = Wire(UInt(1.W));
+  val bus_arb_pfu_ar_grnt = Wire(Bool());
+  val bus_arb_pfu_ar_ready = Wire(Bool());
   val cp0_lsu_dcache_en = Wire(UInt(1.W));
   val cp0_lsu_dcache_pref_en = Wire(UInt(1.W));
   val cp0_lsu_icg_en = Wire(UInt(1.W));
@@ -159,13 +159,13 @@ class ct_lsu_pfu() extends Module {
   val ld_da_pfu_va = Wire(UInt(40.W));
   val ld_da_ppfu_va = Wire(UInt(40.W));
   val ld_da_ppn_ff = Wire(UInt(28.W));
-  val lfb_addr_full = Wire(UInt(1.W));
+  val lfb_addr_full = Wire(Bool());
   val lfb_addr_less2 = Wire(UInt(1.W));
   val lfb_pfu_biu_req_hit_idx = Wire(UInt(1.W));
   val lfb_pfu_create_id = Wire(UInt(5.W));
   val lfb_pfu_dcache_hit = Wire(UInt(9.W));
   val lfb_pfu_dcache_miss = Wire(UInt(9.W));
-  val lfb_pfu_rready_grnt = Wire(UInt(1.W));
+  val lfb_pfu_rready_grnt = Wire(Bool());
   val lm_pfu_biu_req_hit_idx = Wire(UInt(1.W));
   val lsu_mmu_va2 = Wire(UInt(28.W));
   val lsu_mmu_va2_vld = Wire(UInt(1.W));
@@ -183,7 +183,7 @@ class ct_lsu_pfu() extends Module {
   val pfu_all_pfb_biu_pe_req = Wire(UInt(9.W));
   val pfu_all_pfb_biu_pe_req_ptiority_0 = Wire(UInt(9.W));
   val pfu_all_pfb_biu_pe_req_ptiority_1 = Wire(UInt(9.W));
-  val pfu_all_pfb_mmu_pe_req = Wire(UInt(9.W));
+  val pfu_all_pfb_mmu_pe_req = Wire(Vec(9,UInt(1.W)));
   val pfu_biu_ar_addr = Wire(UInt(40.W));
   val pfu_biu_ar_bar = Wire(UInt(2.W));
   val pfu_biu_ar_burst = Wire(UInt(2.W));
@@ -209,27 +209,27 @@ class ct_lsu_pfu() extends Module {
   val pfu_biu_pe_clk_en = Wire(Bool());
   val pfu_biu_pe_req = Wire(Bool());
   val pfu_biu_pe_req_addr_tto6 = Wire(UInt(34.W));
-  val pfu_biu_pe_req_grnt = Wire(UInt(1.W));
+  val pfu_biu_pe_req_grnt = Wire(Bool());
   val pfu_biu_pe_req_page_sec = Wire(UInt(1.W));
   val pfu_biu_pe_req_page_share = Wire(UInt(1.W));
   val pfu_biu_pe_req_priv_mode = Wire(UInt(2.W));
   val pfu_biu_pe_req_ptiority_0 = Wire(UInt(1.W));
   val pfu_biu_pe_req_ptr = Wire(UInt(9.W));
-  val pfu_biu_pe_req_sel_l1 = Wire(UInt(1.W));
+  val pfu_biu_pe_req_sel_l1 = Wire(Bool());
   val pfu_biu_pe_req_src = Wire(UInt(2.W));
-  val pfu_biu_pe_update_permit = Wire(UInt(1.W));
+  val pfu_biu_pe_update_permit = Wire(Bool());
   val pfu_biu_pe_update_vld = Wire(UInt(1.W));
   val pfu_biu_req_addr = Wire(UInt(40.W));
-  val pfu_biu_req_bus_grnt = Wire(UInt(1.W));
-  val pfu_biu_req_grnt = Wire(UInt(1.W));
-  val pfu_biu_req_hit_idx = Wire(UInt(1.W));
+  val pfu_biu_req_bus_grnt = Wire(Bool());
+  val pfu_biu_req_grnt = Wire(Bool());
+  val pfu_biu_req_hit_idx = Wire(Bool());
   val pfu_biu_req_priority_next = Wire(UInt(9.W));
   val pfu_dcache_pref_en = Wire(UInt(1.W));
   val pfu_get_page_sec = Wire(UInt(1.W));
   val pfu_get_page_share = Wire(UInt(1.W));
   val pfu_get_ppn = Wire(UInt(28.W));
   val pfu_get_ppn_err = Wire(UInt(1.W));
-  val pfu_get_ppn_vld = Wire(UInt(1.W));
+  val pfu_get_ppn_vld = Wire(Bool());
 
   val pfu_gpfb_biu_pe_req = Wire(UInt(1.W));
   val pfu_gpfb_biu_pe_req_grnt = Wire(UInt(1.W));
@@ -245,7 +245,7 @@ class ct_lsu_pfu() extends Module {
   val pfu_gpfb_l2_pf_addr = Wire(UInt(40.W));
   val pfu_gpfb_l2_vpn = Wire(UInt(28.W));
   val pfu_gpfb_mmu_pe_req = Wire(UInt(1.W));
-  val pfu_gpfb_mmu_pe_req_grnt = Wire(UInt(1.W));
+  val pfu_gpfb_mmu_pe_req_grnt = Wire(Bool());
   val pfu_gpfb_mmu_pe_req_src = Wire(UInt(2.W));
   val pfu_gpfb_priv_mode = Wire(UInt(2.W));
   val pfu_gpfb_vld = Wire(UInt(1.W));
@@ -270,12 +270,12 @@ class ct_lsu_pfu() extends Module {
   val pfu_mmu_pe_req_sel_l1 = Wire(UInt(1.W));
   val pfu_mmu_pe_req_src = Wire(UInt(2.W));
   val pfu_mmu_pe_req_vpn = Wire(UInt(28.W));
-  val pfu_mmu_pe_update_permit = Wire(UInt(1.W));
+  val pfu_mmu_pe_update_permit = Wire(Bool());
   val pfu_part_empty = Wire(UInt(1.W));
   val pfu_pfb_create_dp_vld = Wire(UInt(1.W));
   val pfu_pfb_create_gateclk_en = Wire(UInt(1.W));
   val pfu_pfb_create_pc = Wire(UInt(15.W));
-  val pfu_pfb_create_ptr = Wire(UInt(8.W));
+  val pfu_pfb_create_ptr = Wire(Vec(8,UInt(1.W)));
   val pfu_pfb_create_stride = Wire(UInt(11.W));
   val pfu_pfb_create_stride_neg = Wire(UInt(1.W));
   val pfu_pfb_create_strideh_6to0 = Wire(UInt(7.W));
@@ -299,14 +299,14 @@ class ct_lsu_pfu() extends Module {
   val pfu_pfb_entry_l2_page_sec = Wire(UInt(8.W));
   val pfu_pfb_entry_l2_page_share = Wire(UInt(8.W));
   val pfu_pfb_entry_l2_pf_addr_7 = VecInit(Seq.fill(8)(Wire(UInt(40.W))));
-  val pfu_pfb_entry_l2_vpn_7 = VecInit(Seq.fill(8)(Wire(UInt(28.W))));
+  val pfu_pfb_entry_l2_vpn = VecInit(Seq.fill(8)(Wire(UInt(28.W))));
   val pfu_pfb_entry_mmu_pe_req = Wire(UInt(8.W));
   val pfu_pfb_entry_mmu_pe_req_grnt = Wire(UInt(8.W));
-  val pfu_pfb_entry_mmu_pe_req_src_7 = VecInit(Seq.fill(8)(Wire(UInt(2.W))));
+  val pfu_pfb_entry_mmu_pe_req_src = VecInit(Seq.fill(8)(Wire(UInt(2.W))));
   val pfu_pfb_entry_priv_mode_7 = VecInit(Seq.fill(8)(Wire(UInt(2.W))));
   val pfu_pfb_entry_vld = Wire(UInt(8.W));
-  val pfu_pfb_full = Wire(UInt(1.W));
-  val pfu_pfb_has_evict = Wire(UInt(1.W));
+  val pfu_pfb_full = Wire(Bool());
+  val pfu_pfb_has_evict = Wire(Bool());
   val pfu_pfb_hit_pc = Wire(UInt(1.W));
   val pfu_pmb_create_dp_vld = Wire(UInt(1.W));
   val pfu_pmb_create_gateclk_en = Wire(UInt(1.W));
@@ -340,15 +340,12 @@ class ct_lsu_pfu() extends Module {
   val pfu_sdb_entry_create_vld = Wire(UInt(2.W));
   val pfu_sdb_entry_evict = Wire(Vec(2, UInt(1.W)));
   val pfu_sdb_entry_hit_pc = Wire(UInt(2.W));
-  val pfu_sdb_entry_pc_0 = Wire(UInt(15.W));
-  val pfu_sdb_entry_pc_1 = Wire(UInt(15.W));
+  val pfu_sdb_entry_pc = Wire(Vec(2,UInt(15.W)));
   val pfu_sdb_entry_ready = Wire(UInt(2.W));
   val pfu_sdb_entry_ready_grnt = Wire(UInt(2.W));
-  val pfu_sdb_entry_stride_0 = Wire(UInt(11.W));
-  val pfu_sdb_entry_stride_1 = Wire(UInt(11.W));
+  val pfu_sdb_entry_stride = Wire(Vec(2,UInt(11.W)));
   val pfu_sdb_entry_stride_neg = Wire(UInt(2.W));
-  val pfu_sdb_entry_strideh_6to0_0 = Wire(UInt(7.W));
-  val pfu_sdb_entry_strideh_6to0_1 = Wire(UInt(7.W));
+  val pfu_sdb_entry_strideh_6to0 = Wire(Vec(2,UInt(7.W)));
   val pfu_sdb_entry_type_ld = Wire(UInt(2.W));
   val pfu_sdb_entry_vld = Wire(Vec(2, UInt(1.W)));
   val pfu_sdb_full = Wire(Bool());
@@ -360,7 +357,7 @@ class ct_lsu_pfu() extends Module {
   val pipe_create_vld = Wire(UInt(1.W));
   val pmb_timeout_cnt_val = Wire(UInt(8.W));
   val rb_pfu_biu_req_hit_idx = Wire(UInt(1.W));
-  val rb_pfu_nc_no_pending = Wire(UInt(1.W));
+  val rb_pfu_nc_no_pending = Wire(Bool());
   val rtu_yy_xx_commit0 = Wire(UInt(1.W));
   val rtu_yy_xx_commit0_iid = Wire(UInt(7.W));
   val rtu_yy_xx_commit1 = Wire(UInt(1.W));
@@ -551,12 +548,12 @@ class ct_lsu_pfu() extends Module {
   pfu_sdb_entry_create_vld(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_create_vld_x
   pfu_sdb_entry_evict(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_evict_x
   pfu_sdb_entry_hit_pc(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_hit_pc_x
-  pfu_sdb_entry_pc_0 := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_pc_v
+  pfu_sdb_entry_pc(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_pc_v
   pfu_sdb_entry_ready_grnt(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_ready_grnt_x
   pfu_sdb_entry_ready(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_ready_x
   pfu_sdb_entry_stride_neg(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_stride_neg_x
-  pfu_sdb_entry_stride_0 := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_stride_v
-  pfu_sdb_entry_strideh_6to0_0 := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_strideh_6to0_v
+  pfu_sdb_entry_stride(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_stride_v
+  pfu_sdb_entry_strideh_6to0(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_strideh_6to0_v
   pfu_sdb_entry_type_ld(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_type_ld_x
   pfu_sdb_entry_vld(0) := x_ct_lsu_pfu_sdb_entry(0).pfu_sdb_entry_vld_x
   x_ct_lsu_pfu_sdb_entry(0).rtu_yy_xx_commit0 := io.rtu_yy_xx_commit0
@@ -597,12 +594,12 @@ class ct_lsu_pfu() extends Module {
   pfu_sdb_entry_create_vld(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_create_vld_x
   pfu_sdb_entry_evict(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_evict_x
   pfu_sdb_entry_hit_pc(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_hit_pc_x
-  pfu_sdb_entry_pc_1 := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_pc_v
+  pfu_sdb_entry_pc(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_pc_v
   pfu_sdb_entry_ready_grnt(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_ready_grnt_x
   pfu_sdb_entry_ready(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_ready_x
   pfu_sdb_entry_stride_neg(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_stride_neg_x
-  pfu_sdb_entry_stride_1 := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_stride_v
-  pfu_sdb_entry_strideh_6to0_1 := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_strideh_6to0_v
+  pfu_sdb_entry_stride(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_stride_v
+  pfu_sdb_entry_strideh_6to0(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_strideh_6to0_v
   pfu_sdb_entry_type_ld(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_type_ld_x
   pfu_sdb_entry_vld(1) := x_ct_lsu_pfu_sdb_entry(1).pfu_sdb_entry_vld_x
   x_ct_lsu_pfu_sdb_entry(1).rtu_yy_xx_commit0 := io.rtu_yy_xx_commit0
@@ -756,7 +753,227 @@ class ct_lsu_pfu() extends Module {
   //------------------pop pointer of sdb----------------------
   // &CombBeg; @307
 
+pfu_sdb_pop_ptr := MuxCase(0.U(2.W), Seq(
+    (pfu_sdb_entry_ready(0) === 0.U) -> 1.U(2.W),
+    (pfu_sdb_entry_ready(1) === 0.U) -> 2.U(2.W)
+  ))
+// &CombEnd; @314
+
+  pfu_pfb_create_pc := (0 to 1).map { i =>
+    Seq.fill(15)(pfu_sdb_pop_ptr(i)).reduce(_ ## _) & pfu_sdb_entry_pc(i)
+  }.reduce(_ | _)
+  pfu_pfb_create_stride := (0 to 1).map { i =>
+    Seq.fill(11)(pfu_sdb_pop_ptr(i)).reduce(_ ## _) & pfu_sdb_entry_stride(i)
+  }.reduce(_ | _)
+    pfu_pfb_create_stride := (0 to 1).map { i =>
+    Seq.fill(7)(pfu_sdb_pop_ptr(i)).reduce(_ ## _) & pfu_sdb_entry_strideh_6to0(i)
+  }.reduce(_ | _)
+  pfu_pfb_create_stride_neg := (pfu_sdb_pop_ptr.asUInt & pfu_sdb_entry_stride_neg).orR
+  pfu_pfb_create_type_ld := (pfu_sdb_pop_ptr.asUInt & pfu_sdb_entry_type_ld).orR
+
+//---------------------create pointer-----------------------
+//if it has empty entry, then create signal to empty entry,
+//else create siganl to evict entry,
+//else create fail
+// &CombBeg; @332
+  pfu_sdb_pop_ptr := MuxCase(0.U(8.W), Seq(
+    (pfu_sdb_entry_ready(0) === 0.U) -> 1.U(2.W),
+    (pfu_sdb_entry_ready(1) === 0.U) -> 2.U(2.W)
+  ))
+
+  pfu_pfb_empty_create_ptr := MuxCase(default = 0.U(8.W), (0 to 7).map { i =>
+    !(pfu_pfb_entry_vld(i).asBool) -> (1.U(8.W) << i)
+  })
+
+ pfu_pfb_evict_create_ptr := MuxCase(default = 0.U(8.W), (0 to 7).map { i =>
+    pfu_pfb_entry_evict(i).asBool -> (1.U(8.W) << i)
+  })
+// &CombEnd; @360
+
+pfu_pfb_full       := pfu_pfb_entry_vld.andR
+pfu_pfb_has_evict  := pfu_pfb_entry_evict.orR
+pfu_pfb_create_ptr := Mux(pfu_pfb_full,pfu_pfb_evict_create_ptr, pfu_pfb_empty_create_ptr)
+
+//-------------------grnt signal of pmb---------------------
+
+pfu_sdb_ready_grnt  := !pfu_pfb_full ||  pfu_pfb_has_evict
+pfu_sdb_entry_ready_grnt := (pfu_sdb_ready_grnt.asUInt ## pfu_sdb_ready_grnt.asUInt) & pfu_sdb_pop_ptr.asUInt
+
+//------------------create signal of sdb--------------------
+pfu_pfb_create_vld  := pfu_sdb_entry_ready.orR
+pfu_pfb_create_dp_vld      := pfu_pfb_create_vld
+pfu_pfb_create_gateclk_en  := pfu_pfb_create_dp_vld
+
+pfu_pfb_entry_create_vld := Seq.fill(8)(pfu_pfb_create_vld).reduce(_ ## _) & pfu_pfb_create_ptr
+pfu_pfb_entry_create_dp_vld := Seq.fill(8)(pfu_pfb_create_dp_vld).reduce(_ ## _) & pfu_pfb_create_ptr
+pfu_pfb_entry_create_gateclk_en := Seq.fill(8)(pfu_pfb_create_gateclk_en).reduce(_ ## _) & pfu_pfb_create_ptr
+
+//==========================================================
+//                      Global PFU
+//==========================================================
+// &Instance("ct_lsu_pfu_gsdb","x_ct_lsu_pfu_gsdb"); @389
+val x_ct_lsu_pfu_gsdb = Module(new ct_lsu_pfu_gsdb)
+  ct_lsu_pfu_gsdb.io.cp0_lsu_icg_en            :=io.cp0_lsu_icg_en          
+  ct_lsu_pfu_gsdb.io.cp0_yy_clk_en             :=io.cp0_yy_clk_en           
+  ct_lsu_pfu_gsdb.io.cp0_yy_dcache_pref_en     :=io.cp0_yy_dcache_pref_en   
+  ct_lsu_pfu_gsdb.io.cpurst_b                  :=io.cpurst_b                
+  ct_lsu_pfu_gsdb.io.forever_cpuclk            :=io.forever_cpuclk          
+  ct_lsu_pfu_gsdb.io.ld_da_iid                 :=io.ld_da_iid               
+  ct_lsu_pfu_gsdb.io.ld_da_pfu_act_vld         :=io.ld_da_pfu_act_vld       
+  ct_lsu_pfu_gsdb.io.ld_da_pfu_pf_inst_vld     :=io.ld_da_pfu_pf_inst_vld   
+  ct_lsu_pfu_gsdb.io.ld_da_pfu_va              :=io.ld_da_pfu_va            
+  ct_lsu_pfu_gsdb.io.pad_yy_icg_scan_en        :=io.pad_yy_icg_scan_en      
+  ct_lsu_pfu_gsdb.io.pfu_gpfb_vld              :=io.pfu_gpfb_vld            
+  ct_lsu_pfu_gsdb.io.pfu_gsdb_gpfb_create_vld  :=io.pfu_gsdb_gpfb_create_vld
+  ct_lsu_pfu_gsdb.io.pfu_gsdb_gpfb_pop_req     :=io.pfu_gsdb_gpfb_pop_req   
+  ct_lsu_pfu_gsdb.io.pfu_gsdb_stride           :=io.pfu_gsdb_stride         
+  ct_lsu_pfu_gsdb.io.pfu_gsdb_stride_neg       :=io.pfu_gsdb_stride_neg     
+  ct_lsu_pfu_gsdb.io.pfu_gsdb_strideh_6to0     :=io.pfu_gsdb_strideh_6to0   
+  ct_lsu_pfu_gsdb.io.pfu_pop_all_vld           :=io.pfu_pop_all_vld         
+  ct_lsu_pfu_gsdb.io.rtu_yy_xx_commit0         :=io.rtu_yy_xx_commit0       
+  ct_lsu_pfu_gsdb.io.rtu_yy_xx_commit0_iid     :=io.rtu_yy_xx_commit0_iid   
+  ct_lsu_pfu_gsdb.io.rtu_yy_xx_commit1         :=io.rtu_yy_xx_commit1       
+  ct_lsu_pfu_gsdb.io.rtu_yy_xx_commit1_iid     :=io.rtu_yy_xx_commit1_iid   
+  ct_lsu_pfu_gsdb.io.rtu_yy_xx_commit2         :=io.rtu_yy_xx_commit2       
+  ct_lsu_pfu_gsdb.io.rtu_yy_xx_commit2_iid     :=io.rtu_yy_xx_commit2_iid   
+  ct_lsu_pfu_gsdb.io.rtu_yy_xx_flush           :=io.rtu_yy_xx_flush         
+
+
+// &Instance("ct_lsu_pfu_gpfb","x_ct_lsu_pfu_gpfb"); @391
+  val x_ct_lsu_pfu_gpfb = ct_lsu_pfu_gpfb
+  ct_lsu_pfu_gpfb.io.cp0_lsu_icg_en                 := io.cp0_lsu_icg_en               
+  ct_lsu_pfu_gpfb.io.cp0_lsu_pfu_mmu_dis            := io.cp0_lsu_pfu_mmu_dis          
+  ct_lsu_pfu_gpfb.io.cp0_yy_clk_en                  := io.cp0_yy_clk_en                
+  ct_lsu_pfu_gpfb.io.cp0_yy_priv_mode               := io.cp0_yy_priv_mode             
+  ct_lsu_pfu_gpfb.io.cpurst_b                       := io.cpurst_b                     
+  ct_lsu_pfu_gpfb.io.forever_cpuclk                 := io.forever_cpuclk               
+  ct_lsu_pfu_gpfb.io.ld_da_page_sec_ff              := io.ld_da_page_sec_ff            
+  ct_lsu_pfu_gpfb.io.ld_da_page_share_ff            := io.ld_da_page_share_ff          
+  ct_lsu_pfu_gpfb.io.ld_da_pfu_act_vld              := io.ld_da_pfu_act_vld            
+  ct_lsu_pfu_gpfb.io.ld_da_pfu_pf_inst_vld          := io.ld_da_pfu_pf_inst_vld        
+  ct_lsu_pfu_gpfb.io.ld_da_pfu_va                   := io.ld_da_pfu_va                 
+  ct_lsu_pfu_gpfb.io.ld_da_ppn_ff                   := io.ld_da_ppn_ff                 
+  ct_lsu_pfu_gpfb.io.lsu_pfu_l1_dist_sel            := io.lsu_pfu_l1_dist_sel          
+  ct_lsu_pfu_gpfb.io.lsu_pfu_l2_dist_sel            := io.lsu_pfu_l2_dist_sel          
+  ct_lsu_pfu_gpfb.io.pad_yy_icg_scan_en             := io.pad_yy_icg_scan_en           
+  ct_lsu_pfu_gpfb.io.pfu_biu_pe_req_sel_l1          := io.pfu_biu_pe_req_sel_l1        
+  ct_lsu_pfu_gpfb.io.pfu_dcache_pref_en             := io.pfu_dcache_pref_en           
+  ct_lsu_pfu_gpfb.io.pfu_get_page_sec               := io.pfu_get_page_sec             
+  ct_lsu_pfu_gpfb.io.pfu_get_page_share             := io.pfu_get_page_share           
+  ct_lsu_pfu_gpfb.io.pfu_get_ppn                    := io.pfu_get_ppn                  
+  ct_lsu_pfu_gpfb.io.pfu_get_ppn_err                := io.pfu_get_ppn_err              
+  ct_lsu_pfu_gpfb.io.pfu_get_ppn_vld                := io.pfu_get_ppn_vld              
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_biu_pe_req            := io.pfu_gpfb_biu_pe_req          
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_biu_pe_req_grnt       := io.pfu_gpfb_biu_pe_req_grnt     
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_biu_pe_req_src        := io.pfu_gpfb_biu_pe_req_src      
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_from_lfb_dcache_hit   := io.pfu_gpfb_from_lfb_dcache_hit 
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_from_lfb_dcache_miss  := io.pfu_gpfb_from_lfb_dcache_miss
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_l1_page_sec           := io.pfu_gpfb_l1_page_sec         
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_l1_page_share         := io.pfu_gpfb_l1_page_share       
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_l1_pf_addr            := io.pfu_gpfb_l1_pf_addr          
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_l1_vpn                := io.pfu_gpfb_l1_vpn              
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_l2_page_sec           := io.pfu_gpfb_l2_page_sec         
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_l2_page_share         := io.pfu_gpfb_l2_page_share       
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_l2_pf_addr            := io.pfu_gpfb_l2_pf_addr          
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_l2_vpn                := io.pfu_gpfb_l2_vpn              
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_mmu_pe_req            := io.pfu_gpfb_mmu_pe_req          
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_mmu_pe_req_grnt       := io.pfu_gpfb_mmu_pe_req_grnt     
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_mmu_pe_req_src        := io.pfu_gpfb_mmu_pe_req_src      
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_priv_mode             := io.pfu_gpfb_priv_mode           
+  ct_lsu_pfu_gpfb.io.pfu_gpfb_vld                   := io.pfu_gpfb_vld                 
+  ct_lsu_pfu_gpfb.io.pfu_gsdb_gpfb_create_vld       := io.pfu_gsdb_gpfb_create_vld     
+  ct_lsu_pfu_gpfb.io.pfu_gsdb_gpfb_pop_req          := io.pfu_gsdb_gpfb_pop_req        
+  ct_lsu_pfu_gpfb.io.pfu_gsdb_stride                := io.pfu_gsdb_stride              
+  ct_lsu_pfu_gpfb.io.pfu_gsdb_stride_neg            := io.pfu_gsdb_stride_neg          
+  ct_lsu_pfu_gpfb.io.pfu_gsdb_strideh_6to0          := io.pfu_gsdb_strideh_6to0        
+  ct_lsu_pfu_gpfb.io.pfu_l2_pref_en                 := io.pfu_l2_pref_en               
+  ct_lsu_pfu_gpfb.io.pfu_mmu_pe_req_sel_l1          := io.pfu_mmu_pe_req_sel_l1        
+  ct_lsu_pfu_gpfb.io.pfu_pop_all_vld                := io.pfu_pop_all_vld              
+
+
+//==========================================================
+//         
+//==========================================================
+//----------------------registers---------------------------
+//+-----+-----+----+
+//| req | vpn | id |
+//+-----+-----+----+
+
+shixukongzhe   1939-1967
+
+//---------------------update signal------------------------
+pfu_all_pfb_mmu_pe_req  := pfu_gpfb_mmu_pe_req ## pfu_pfb_entry_mmu_pe_req
+pfu_mmu_pe_req       := pfu_all_pfb_mmu_pe_req.orR
+pfu_mmu_pe_update_permit := !pfu_mmu_req ||  pfu_get_ppn_vld
+
+//---------------------grnt and resp signal-----------------
+pfu_pfb_entry_mmu_pe_req_grnt_x := Seq.fill(8)(pfu_mmu_pe_update_permit).reduce(_ ## _) & pfu_mmu_pe_req_ptr
+pfu_gpfb_mmu_pe_req_grnt = pfu_mmu_pe_update_permit  &&  pfu_mmu_pe_req_ptr(8).asBool
+
+// &CombBeg; @445
+pfu_mmu_pe_req_ptr := MuxCase(default = 0.U(9.W), (0 to 8).map { i =>
+    pfu_all_pfb_mmu_pe_req(i).asBool -> (1.U(9.W) << i)
+  })
+
+//------------sel info to pop entry---------------
+pfu_mmu_l1_pe_req_vpn := ((0 to 7).map { i =>
+    Seq.fill(28)(pfu_mmu_pe_req_ptr(i)).reduce(_ ## _) & pfu_pfb_entry_l1_vpn(i)
+  }.reduce(_ | _)) | Seq.fill(28)(pfu_mmu_pe_req_ptr(i)).reduce(_ ## _) & pfu_gpfb_l1_vpn
+
+pfu_mmu_l2_pe_req_vpn := ((0 to 7).map { i =>
+    Seq.fill(28)(pfu_mmu_pe_req_ptr(i)).reduce(_ ## _) & pfu_pfb_entry_l2_vpn(i)
+  }.reduce(_ | _)) | Seq.fill(28)(pfu_mmu_pe_req_ptr(i)).reduce(_ ## _) & pfu_gpfb_l2_vpn
+
+pfu_mmu_l1_pe_req_vpn := ((0 to 7).map { i =>
+    Seq.fill(2)(pfu_mmu_pe_req_ptr(i)).reduce(_ ## _) & pfu_pfb_entry_mmu_pe_req_src(i)
+  }.reduce(_ | _)) | Seq.fill(2)(pfu_mmu_pe_req_ptr(i)).reduce(_ ## _) & pfu_gpfb_mmu_pe_req_src
+
+pfu_mmu_pe_req_sel_l1        := pfu_mmu_pe_req_src(0)
+
+pfu_mmu_pe_req_vpn := Mux(pfu_mmu_pe_req_sel_l1, pfu_mmu_l1_pe_req_vpn, pfu_mmu_l2_pe_req_vpn)
+
+lsu_mmu_va2_vld              := pfu_mmu_req
+lsu_mmu_va2  := pfu_mmu_req_vpn
+pfu_get_ppn_vld              := mmu_lsu_pa2_vld
+pfu_get_ppn_err              := mmu_lsu_pa2_err
+pfu_get_ppn  := mmu_lsu_pa2
+pfu_get_page_sec             := mmu_lsu_sec2
+pfu_get_page_share           := mmu_lsu_share2
+
+//==========================================================
+//          Instance biu pop entry and logic
+//==========================================================
+//----------------------registers---------------------------
+//+-----+------+---------+----------+
+//| req | addr | req_ptr | priority |
+//+-----+------+---------+----------+
+
+shixubuhui 2059-2094
+
+//---------------------update signal------------------------ \\更新信号
+pfu_all_pfb_biu_pe_req  := pfu_gpfb_biu_pe_req ## pfu_pfb_entry_biu_pe_req
+pfu_biu_pe_req       :=  pfu_all_pfb_biu_pe_req.orR
+pfu_biu_req_grnt     := bus_arb_pfu_ar_grnt ||  pfu_biu_req_unmask &&  pfu_biu_req_l1  &&  pfu_biu_req_hit_idx;
+//for timing,create bus grant without hit_idx
+pfu_biu_req_bus_grnt := bus_arb_pfu_ar_ready && (!lfb_addr_full && (lfb_pfu_rready_grnt || rb_pfu_nc_no_pending) || !pfu_biu_req_l1)
+
+//for timing, do not use pipe   \\
+pfu_biu_pe_update_permit := !pfu_biu_req_unmask || pfu_biu_req_bus_grnt
+pfu_biu_pe_update_vld    := pfu_biu_pe_update_permit &&  pfu_biu_pe_req
+
+//if grnt entry only req l1, and lfb_addr_less 2, then do not grnt
+ pfu_biu_pe_req_grnt      := pfu_biu_pe_update_permit  &&  (pfu_biu_pe_req_sel_l1 ||  pfu_biu_pe_req_src(0).asBool)
+
+/---------------------grnt signal--------------------------  \\选中信号
+//for timing grnt signal add gateclk
+ pfu_pfb_entry_biu_pe_req_grnt := Seq.fill(8)(pfu_biu_pe_req_grnt).reduce(_ ## _) & pfu_biu_pe_req_ptr
+pfu_gpfb_biu_pe_req_grnt := pfu_biu_pe_req_grnt  &&  pfu_biu_pe_req_ptr(8).asBool
+//---------------------update info--------------------------
+
+
 }
+
+
 
 class gated_clk_cell_IO extends Bundle {
   val clk_in = Input(Clock());
@@ -798,4 +1015,6 @@ class gated_clk_cell extends RawModule {
   clk_en_bf_latch := (io.global_en && (io.module_en || io.local_en)) || io.external_en
   SE := io.pad_yy_icg_scan_en
   io.clk_out := io.clk_in
+
+  pfu_pfb_entry_create_vld := Seq.fill(15)(pfu_sdb_pop_ptr(i)).reduce(_ ## _) & pfu_pfb_create_ptr
 }
