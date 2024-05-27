@@ -18,7 +18,7 @@ class MyIO extends Bundle {
   val cp0_yy_clk_en = Input(UInt(1.W));
   val cp0_yy_dcache_pref_en = Input(UInt(1.W));
   val cp0_yy_priv_mode = Input(UInt(2.W));
-  val cpurst_b = Input(UInt(1.W));
+  val cpurst_b = Input(Bool);
   val forever_cpuclk = Input(UInt(1.W));
   val icc_idle = Input(UInt(1.W));
   val ld_da_iid = Input(UInt(7.W));
@@ -144,7 +144,7 @@ class ct_lsu_pfu() extends Module {
   val cp0_yy_clk_en = Wire(UInt(1.W));
   val cp0_yy_dcache_pref_en = Wire(UInt(1.W));
   val cp0_yy_priv_mode = Wire(UInt(2.W));
-  val cpurst_b = Wire(UInt(1.W));
+  val cpurst_b = Wire(Bool());
   val forever_cpuclk = Wire(UInt(1.W));
   val icc_idle = Wire(UInt(1.W));
   val ld_da_iid = Wire(UInt(7.W));
@@ -264,7 +264,7 @@ class ct_lsu_pfu() extends Module {
   val pfu_lfb_id = Wire(UInt(4.W));
   val pfu_mmu_l1_pe_req_vpn = Wire(UInt(28.W));
   val pfu_mmu_l2_pe_req_vpn = Wire(UInt(28.W));
-  val pfu_mmu_pe_clk = Wire(UInt(1.W));
+  val pfu_mmu_pe_clk = Wire(Clock());
   val pfu_mmu_pe_clk_en = Wire(UInt(1.W));
   val pfu_mmu_pe_req = Wire(UInt(1.W));
   val pfu_mmu_pe_req_sel_l1 = Wire(UInt(1.W));
@@ -327,7 +327,7 @@ class ct_lsu_pfu() extends Module {
   val pfu_pmb_hit_pc = Wire(UInt(1.W));
   val pfu_pmb_ready_grnt = Wire(Bool());
   val pfu_pop_all_part_vld = Wire(UInt(1.W));
-  val pfu_pop_all_vld = Wire(UInt(1.W));
+  val pfu_pop_all_vld = Wire(Bool());
   val pfu_sdb_create_dp_vld = Wire(UInt(1.W));
   val pfu_sdb_create_gateclk_en = Wire(Bool());
   val pfu_sdb_create_pc = Wire(UInt(15.W));
@@ -899,7 +899,36 @@ val x_ct_lsu_pfu_gsdb = Module(new ct_lsu_pfu_gsdb)
 //| req | vpn | id |
 //+-----+-----+----+
 
-shixukongzhe   1939-1967
+withClockAndReset(pfu_mmu_pe_clk,(!cpurst_b)asTypeOf(AsyncReset())){
+val pfu_mmu_req_reg = RegInit(False.B)
+
+pfu_mmu_req := pfu_mmu_req_reg
+
+when(pfu_pop_all_vld)
+    pfu_mmu_req_reg               :=  False
+  .elsewhen(pfu_mmu_pe_update_permit  &&  pfu_mmu_pe_req)
+    pfu_mmu_req_reg               :=  True
+  .elsewhen(pfu_get_ppn_vld)
+    pfu_mmu_req_reg               :=  False
+}
+
+withClockAndReset(pfu_mmu_pe_clk,(!cpurst_b)asTypeOf(AsyncReset())){
+
+val pfu_mmu_req_l1_reg = RegInit(0.U)
+val pfu_mmu_req_ptr_reg = RegInit(0.U)
+val pfu_mmu_req_vpn_reg = RegInit(0.U)
+
+pfu_mmu_req_l1 := pfu_mmu_req_l1_reg
+pfu_mmu_req_ptr := pfu_mmu_req_ptr_reg
+pfu_mmu_req_vpn := pfu_mmu_req_vpn_reg
+
+when(pfu_mmu_pe_update_permit &&  pfu_mmu_pe_req)
+{
+    pfu_mmu_req_l1_reg     :=  pfu_mmu_pe_req_sel_l1
+    pfu_mmu_req_ptr_reg    :=  pfu_mmu_pe_req_ptr
+    pfu_mmu_req_vpn_reg  :=  pfu_mmu_pe_req_vpn
+}
+}
 
 //---------------------update signal------------------------
 pfu_all_pfb_mmu_pe_req  := pfu_gpfb_mmu_pe_req ## pfu_pfb_entry_mmu_pe_req
@@ -948,7 +977,49 @@ pfu_get_page_share           := mmu_lsu_share2
 //| req | addr | req_ptr | priority |
 //+-----+------+---------+----------+
 
-shixubuhui 2059-2094
+withClockAndReset(pfu_biu_pe_clk,(!cpurst_b)asTypeOf(AsyncReset())){
+
+val pfu_biu_req_unmask_reg = RegInit(0.U)
+
+pfu_biu_req_unmask := pfu_biu_req_unmask_reg
+
+  when(pfu_pop_all_vld)
+    pfu_biu_req_unmask_reg          :=  0.U
+  .elsewhen(pfu_biu_pe_req_grnt)
+    pfu_biu_req_unmask_reg          :=  1.U
+  .elsewhen(pfu_biu_req_grnt)
+    pfu_biu_req_unmask_reg          :=  0.U
+}
+
+withClockAndReset(pfu_biu_pe_clk,(!cpurst_b)asTypeOf(AsyncReset())){
+
+   val pfu_biu_req_l1_reg         =  RegInit(0.U)
+   val pfu_biu_req_addr_tto6_reg =  RegInit(0.U)
+   val pfu_biu_req_page_sec_reg   =  RegInit(0.U)
+   val pfu_biu_req_page_share_reg =  RegInit(0.U)
+   val pfu_biu_req_priv_mode_reg =  RegInit(0.U)
+   val pfu_biu_req_ptr_reg =  RegInit(0.U)
+   val pfu_biu_req_priority_reg =  RegInit(0.U)
+
+   pfu_biu_req_l1         = pfu_biu_req_l1_reg
+   pfu_biu_req_addr_tto6 =  pfu_biu_req_addr_tto6_reg
+   pfu_biu_req_page_sec   = pfu_biu_req_page_sec_reg
+   pfu_biu_req_page_share = pfu_biu_req_page_share_reg
+   pfu_biu_req_priv_mode =  pfu_biu_req_priv_mode_reg
+   pfu_biu_req_ptr =  pfu_biu_req_ptr_reg
+   pfu_biu_req_priority =  pfu_biu_req_priority_reg
+
+when(pfu_biu_pe_update_vld)
+{
+    pfu_biu_req_l1_reg                        :=  pfu_biu_pe_req_sel_l1
+    pfu_biu_req_addr_tto6_reg  :=  pfu_biu_pe_req_addr_tto6
+    pfu_biu_req_page_sec_reg                  :=  pfu_biu_pe_req_page_sec
+    pfu_biu_req_page_share_reg                :=  pfu_biu_pe_req_page_share
+    pfu_biu_req_priv_mode_reg            :=  pfu_biu_pe_req_priv_mode
+    pfu_biu_req_ptr_reg         :=  pfu_biu_pe_req_ptr
+    pfu_biu_req_priority_reg     :=  pfu_biu_req_priority_next
+}
+}
 
 //---------------------update signal------------------------ \\更新信号
 pfu_all_pfb_biu_pe_req  := pfu_gpfb_biu_pe_req ## pfu_pfb_entry_biu_pe_req
