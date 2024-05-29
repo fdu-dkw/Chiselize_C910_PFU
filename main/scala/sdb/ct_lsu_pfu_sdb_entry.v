@@ -51,13 +51,13 @@ module ct_lsu_pfu_sdb_entry(
   reg [31:0] _RAND_3;
   reg [31:0] _RAND_4;
 `endif // RANDOMIZE_REG_INIT
-  wire  gatedClkCell_clk_in; // @[ct_lsu_pfu_sdb_entry.scala 145:28]
-  wire  gatedClkCell_clk_out; // @[ct_lsu_pfu_sdb_entry.scala 145:28]
-  wire  gatedClkCell_external_en; // @[ct_lsu_pfu_sdb_entry.scala 145:28]
-  wire  gatedClkCell_global_en; // @[ct_lsu_pfu_sdb_entry.scala 145:28]
-  wire  gatedClkCell_local_en; // @[ct_lsu_pfu_sdb_entry.scala 145:28]
-  wire  gatedClkCell_module_en; // @[ct_lsu_pfu_sdb_entry.scala 145:28]
-  wire  gatedClkCell_pad_yy_icg_scan_en; // @[ct_lsu_pfu_sdb_entry.scala 145:28]
+  wire  gatedClkCell_1_clk_in; // @[ct_lsu_pfu_sdb_entry.scala 145:30]
+  wire  gatedClkCell_1_clk_out; // @[ct_lsu_pfu_sdb_entry.scala 145:30]
+  wire  gatedClkCell_1_external_en; // @[ct_lsu_pfu_sdb_entry.scala 145:30]
+  wire  gatedClkCell_1_global_en; // @[ct_lsu_pfu_sdb_entry.scala 145:30]
+  wire  gatedClkCell_1_local_en; // @[ct_lsu_pfu_sdb_entry.scala 145:30]
+  wire  gatedClkCell_1_module_en; // @[ct_lsu_pfu_sdb_entry.scala 145:30]
+  wire  gatedClkCell_1_pad_yy_icg_scan_en; // @[ct_lsu_pfu_sdb_entry.scala 145:30]
   wire  gatedClkCell_2_clk_in; // @[ct_lsu_pfu_sdb_entry.scala 158:30]
   wire  gatedClkCell_2_clk_out; // @[ct_lsu_pfu_sdb_entry.scala 158:30]
   wire  gatedClkCell_2_external_en; // @[ct_lsu_pfu_sdb_entry.scala 158:30]
@@ -106,8 +106,8 @@ module ct_lsu_pfu_sdb_entry(
   reg  pfu_sdb_entry_vld; // @[ct_lsu_pfu_sdb_entry.scala 62:34]
   wire  _T = ~io_cpurst_b; // @[ct_lsu_pfu_sdb_entry.scala 187:40]
   wire  _GEN_0 = io_pfu_sdb_entry_create_vld_x | pfu_sdb_entry_vld; // @[ct_lsu_pfu_sdb_entry.scala 192:44 193:25 62:34]
-  wire  pfu_sdb_entry_normal_stride = ctLsuPfuSdbEntryCmp_entry_normal_stride; // @[ct_lsu_pfu_sdb_entry.scala 102:41 260:33]
-  wire  pfu_sdb_entry_addr_cmp_info_vld = ctLsuPfuSdbEntryCmp_entry_addr_cmp_info_vld; // @[ct_lsu_pfu_sdb_entry.scala 255:37 84:45]
+  wire  pfu_sdb_entry_normal_stride = ctLsuPfuSdbEntryCmp_entry_normal_stride; // @[ct_lsu_pfu_sdb_entry.scala 102:41 260:31]
+  wire  pfu_sdb_entry_addr_cmp_info_vld = ctLsuPfuSdbEntryCmp_entry_addr_cmp_info_vld; // @[ct_lsu_pfu_sdb_entry.scala 255:35 84:45]
   wire  pfu_pop_st_all = pfu_sdb_entry_vld & ~pfu_sdb_entry_type_ld & (~io_cp0_lsu_l2_st_pref_en | io_amr_wa_cancel); // @[ct_lsu_pfu_sdb_entry.scala 317:65]
   wire  pfu_sdb_entry_pop_vld = io_pfu_sdb_entry_ready_grnt_x | ~pfu_sdb_entry_normal_stride &
     pfu_sdb_entry_addr_cmp_info_vld & pfu_sdb_entry_vld | pfu_pop_st_all | io_pfu_pop_all_part_vld; // @[ct_lsu_pfu_sdb_entry.scala 320:159]
@@ -121,16 +121,16 @@ module ct_lsu_pfu_sdb_entry(
   wire  pfu_sdb_entry_evict_set = pfu_sdb_entry_vld & pipe_cmp_inst_vld & pfu_sdb_entry_timeout_cnt_full & ~
     pfu_sdb_entry_hit_pc; // @[ct_lsu_pfu_sdb_entry.scala 309:127]
   wire  _GEN_10 = pfu_sdb_entry_evict_set | pfu_sdb_entry_evict; // @[ct_lsu_pfu_sdb_entry.scala 240:41 241:27 57:36]
-  GatedClkCell gatedClkCell ( // @[ct_lsu_pfu_sdb_entry.scala 145:28]
-    .clk_in(gatedClkCell_clk_in),
-    .clk_out(gatedClkCell_clk_out),
-    .external_en(gatedClkCell_external_en),
-    .global_en(gatedClkCell_global_en),
-    .local_en(gatedClkCell_local_en),
-    .module_en(gatedClkCell_module_en),
-    .pad_yy_icg_scan_en(gatedClkCell_pad_yy_icg_scan_en)
+  gated_clk_cell gatedClkCell_1 ( // @[ct_lsu_pfu_sdb_entry.scala 145:30]
+    .clk_in(gatedClkCell_1_clk_in),
+    .clk_out(gatedClkCell_1_clk_out),
+    .external_en(gatedClkCell_1_external_en),
+    .global_en(gatedClkCell_1_global_en),
+    .local_en(gatedClkCell_1_local_en),
+    .module_en(gatedClkCell_1_module_en),
+    .pad_yy_icg_scan_en(gatedClkCell_1_pad_yy_icg_scan_en)
   );
-  GatedClkCell gatedClkCell_2 ( // @[ct_lsu_pfu_sdb_entry.scala 158:30]
+  gated_clk_cell gatedClkCell_2 ( // @[ct_lsu_pfu_sdb_entry.scala 158:30]
     .clk_in(gatedClkCell_2_clk_in),
     .clk_out(gatedClkCell_2_clk_out),
     .external_en(gatedClkCell_2_external_en),
@@ -139,7 +139,7 @@ module ct_lsu_pfu_sdb_entry(
     .module_en(gatedClkCell_2_module_en),
     .pad_yy_icg_scan_en(gatedClkCell_2_pad_yy_icg_scan_en)
   );
-  GatedClkCell gatedClkCell_3 ( // @[ct_lsu_pfu_sdb_entry.scala 171:30]
+  gated_clk_cell gatedClkCell_3 ( // @[ct_lsu_pfu_sdb_entry.scala 171:30]
     .clk_in(gatedClkCell_3_clk_in),
     .clk_out(gatedClkCell_3_clk_out),
     .external_en(gatedClkCell_3_external_en),
@@ -148,7 +148,7 @@ module ct_lsu_pfu_sdb_entry(
     .module_en(gatedClkCell_3_module_en),
     .pad_yy_icg_scan_en(gatedClkCell_3_pad_yy_icg_scan_en)
   );
-  CtlLsuPfuSdbEntryCmp ctLsuPfuSdbEntryCmp ( // @[ct_lsu_pfu_sdb_entry.scala 249:35]
+  ct_lsu_pfu_sdb_entry_cmp ctLsuPfuSdbEntryCmp ( // @[ct_lsu_pfu_sdb_entry.scala 249:35]
     .cp0_lsu_icg_en(ctLsuPfuSdbEntryCmp_cp0_lsu_icg_en),
     .cp0_yy_clk_en(ctLsuPfuSdbEntryCmp_cp0_yy_clk_en),
     .cpurst_b(ctLsuPfuSdbEntryCmp_cpurst_b),
@@ -181,17 +181,17 @@ module ct_lsu_pfu_sdb_entry(
   assign io_pfu_sdb_entry_hit_pc_x = pfu_sdb_entry_hit_pc & ~(pfu_sdb_entry_type_ld ^ io_ld_da_pfu_act_dp_vld); // @[ct_lsu_pfu_sdb_entry.scala 300:56]
   assign io_pfu_sdb_entry_pc_v = pfu_sdb_entry_pc; // @[ct_lsu_pfu_sdb_entry.scala 335:39]
   assign io_pfu_sdb_entry_ready_x = 1'h0; // @[ct_lsu_pfu_sdb_entry.scala 336:39]
-  assign io_pfu_sdb_entry_stride_neg_x = ctLsuPfuSdbEntryCmp_entry_stride_neg; // @[ct_lsu_pfu_sdb_entry.scala 111:38 264:30]
-  assign io_pfu_sdb_entry_stride_v = ctLsuPfuSdbEntryCmp_entry_stride; // @[ct_lsu_pfu_sdb_entry.scala 110:34 262:26]
-  assign io_pfu_sdb_entry_strideh_6to0_v = ctLsuPfuSdbEntryCmp_entry_strideh_6to0; // @[ct_lsu_pfu_sdb_entry.scala 114:40 265:32]
+  assign io_pfu_sdb_entry_stride_neg_x = ctLsuPfuSdbEntryCmp_entry_stride_neg; // @[ct_lsu_pfu_sdb_entry.scala 111:38 264:28]
+  assign io_pfu_sdb_entry_stride_v = ctLsuPfuSdbEntryCmp_entry_stride; // @[ct_lsu_pfu_sdb_entry.scala 110:34 262:24]
+  assign io_pfu_sdb_entry_strideh_6to0_v = ctLsuPfuSdbEntryCmp_entry_strideh_6to0; // @[ct_lsu_pfu_sdb_entry.scala 114:40 265:30]
   assign io_pfu_sdb_entry_type_ld_x = pfu_sdb_entry_type_ld; // @[ct_lsu_pfu_sdb_entry.scala 341:39]
   assign io_pfu_sdb_entry_vld_x = pfu_sdb_entry_vld; // @[ct_lsu_pfu_sdb_entry.scala 334:39]
-  assign gatedClkCell_clk_in = io_lsu_special_clk; // @[ct_lsu_pfu_sdb_entry.scala 147:26]
-  assign gatedClkCell_external_en = 1'h0; // @[ct_lsu_pfu_sdb_entry.scala 149:31]
-  assign gatedClkCell_global_en = io_cp0_yy_clk_en; // @[ct_lsu_pfu_sdb_entry.scala 150:29]
-  assign gatedClkCell_local_en = pfu_sdb_entry_vld | io_pfu_sdb_entry_create_gateclk_en_x; // @[ct_lsu_pfu_sdb_entry.scala 142:45]
-  assign gatedClkCell_module_en = io_cp0_lsu_icg_en; // @[ct_lsu_pfu_sdb_entry.scala 152:29]
-  assign gatedClkCell_pad_yy_icg_scan_en = io_pad_yy_icg_scan_en; // @[ct_lsu_pfu_sdb_entry.scala 153:38]
+  assign gatedClkCell_1_clk_in = io_lsu_special_clk; // @[ct_lsu_pfu_sdb_entry.scala 147:28]
+  assign gatedClkCell_1_external_en = 1'h0; // @[ct_lsu_pfu_sdb_entry.scala 149:33]
+  assign gatedClkCell_1_global_en = io_cp0_yy_clk_en; // @[ct_lsu_pfu_sdb_entry.scala 150:31]
+  assign gatedClkCell_1_local_en = pfu_sdb_entry_vld | io_pfu_sdb_entry_create_gateclk_en_x; // @[ct_lsu_pfu_sdb_entry.scala 142:45]
+  assign gatedClkCell_1_module_en = io_cp0_lsu_icg_en; // @[ct_lsu_pfu_sdb_entry.scala 152:31]
+  assign gatedClkCell_1_pad_yy_icg_scan_en = io_pad_yy_icg_scan_en; // @[ct_lsu_pfu_sdb_entry.scala 153:40]
   assign gatedClkCell_2_clk_in = io_lsu_special_clk; // @[ct_lsu_pfu_sdb_entry.scala 160:28]
   assign gatedClkCell_2_external_en = 1'h0; // @[ct_lsu_pfu_sdb_entry.scala 162:33]
   assign gatedClkCell_2_global_en = io_cp0_yy_clk_en; // @[ct_lsu_pfu_sdb_entry.scala 163:31]
@@ -205,27 +205,27 @@ module ct_lsu_pfu_sdb_entry(
     io_pfu_sdb_entry_create_gateclk_en_x; // @[ct_lsu_pfu_sdb_entry.scala 168:115]
   assign gatedClkCell_3_module_en = io_cp0_lsu_icg_en; // @[ct_lsu_pfu_sdb_entry.scala 178:31]
   assign gatedClkCell_3_pad_yy_icg_scan_en = io_pad_yy_icg_scan_en; // @[ct_lsu_pfu_sdb_entry.scala 179:40]
-  assign ctLsuPfuSdbEntryCmp_cp0_lsu_icg_en = io_cp0_lsu_icg_en; // @[ct_lsu_pfu_sdb_entry.scala 251:43]
-  assign ctLsuPfuSdbEntryCmp_cp0_yy_clk_en = io_cp0_yy_clk_en; // @[ct_lsu_pfu_sdb_entry.scala 252:42]
-  assign ctLsuPfuSdbEntryCmp_cpurst_b = io_cpurst_b; // @[ct_lsu_pfu_sdb_entry.scala 253:37]
-  assign ctLsuPfuSdbEntryCmp_entry_addr0_act = 1'h1; // @[ct_lsu_pfu_sdb_entry.scala 254:44]
-  assign ctLsuPfuSdbEntryCmp_entry_clk = gatedClkCell_clk_out; // @[ct_lsu_pfu_sdb_entry.scala 148:21 86:31]
+  assign ctLsuPfuSdbEntryCmp_cp0_lsu_icg_en = io_cp0_lsu_icg_en; // @[ct_lsu_pfu_sdb_entry.scala 251:41]
+  assign ctLsuPfuSdbEntryCmp_cp0_yy_clk_en = io_cp0_yy_clk_en; // @[ct_lsu_pfu_sdb_entry.scala 252:40]
+  assign ctLsuPfuSdbEntryCmp_cpurst_b = io_cpurst_b; // @[ct_lsu_pfu_sdb_entry.scala 253:35]
+  assign ctLsuPfuSdbEntryCmp_entry_addr0_act = 1'h1; // @[ct_lsu_pfu_sdb_entry.scala 254:42]
+  assign ctLsuPfuSdbEntryCmp_entry_clk = gatedClkCell_1_clk_out; // @[ct_lsu_pfu_sdb_entry.scala 148:21 86:31]
   assign ctLsuPfuSdbEntryCmp_entry_create_dp_vld = io_pfu_sdb_entry_create_dp_vld_x; // @[ct_lsu_pfu_sdb_entry.scala 328:36 90:41]
   assign ctLsuPfuSdbEntryCmp_entry_create_gateclk_en = io_pfu_sdb_entry_create_gateclk_en_x; // @[ct_lsu_pfu_sdb_entry.scala 329:36 92:45]
   assign ctLsuPfuSdbEntryCmp_entry_pf_inst_vld = pfu_sdb_entry_hit_pc & pipe_cmp_inst_vld; // @[ct_lsu_pfu_sdb_entry.scala 297:53]
-  assign ctLsuPfuSdbEntryCmp_entry_stride_keep = 1'h0; // @[ct_lsu_pfu_sdb_entry.scala 263:46]
-  assign ctLsuPfuSdbEntryCmp_entry_vld = pfu_sdb_entry_vld; // @[ct_lsu_pfu_sdb_entry.scala 266:38]
-  assign ctLsuPfuSdbEntryCmp_forever_cpuclk = io_lsu_special_clk; // @[ct_lsu_pfu_sdb_entry.scala 267:43]
+  assign ctLsuPfuSdbEntryCmp_entry_stride_keep = 1'h0; // @[ct_lsu_pfu_sdb_entry.scala 263:44]
+  assign ctLsuPfuSdbEntryCmp_entry_vld = pfu_sdb_entry_vld; // @[ct_lsu_pfu_sdb_entry.scala 266:36]
+  assign ctLsuPfuSdbEntryCmp_forever_cpuclk = io_lsu_special_clk; // @[ct_lsu_pfu_sdb_entry.scala 267:41]
   assign ctLsuPfuSdbEntryCmp_ld_da_iid = pfu_sdb_entry_type_ld ? io_ld_da_iid : io_st_da_iid; // @[ct_lsu_pfu_sdb_entry.scala 288:18]
-  assign ctLsuPfuSdbEntryCmp_pad_yy_icg_scan_en = io_pad_yy_icg_scan_en; // @[ct_lsu_pfu_sdb_entry.scala 269:47]
+  assign ctLsuPfuSdbEntryCmp_pad_yy_icg_scan_en = io_pad_yy_icg_scan_en; // @[ct_lsu_pfu_sdb_entry.scala 269:45]
   assign ctLsuPfuSdbEntryCmp_pipe_va = pfu_sdb_entry_type_ld ? io_ld_da_ppfu_va : io_st_da_ppfu_va; // @[ct_lsu_pfu_sdb_entry.scala 290:22]
-  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit0 = io_rtu_yy_xx_commit0; // @[ct_lsu_pfu_sdb_entry.scala 271:46]
-  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit0_iid = io_rtu_yy_xx_commit0_iid; // @[ct_lsu_pfu_sdb_entry.scala 272:50]
-  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit1 = io_rtu_yy_xx_commit1; // @[ct_lsu_pfu_sdb_entry.scala 273:46]
-  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit1_iid = io_rtu_yy_xx_commit1_iid; // @[ct_lsu_pfu_sdb_entry.scala 274:50]
-  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit2 = io_rtu_yy_xx_commit2; // @[ct_lsu_pfu_sdb_entry.scala 275:46]
-  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit2_iid = io_rtu_yy_xx_commit2_iid; // @[ct_lsu_pfu_sdb_entry.scala 276:50]
-  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_flush = io_rtu_yy_xx_flush; // @[ct_lsu_pfu_sdb_entry.scala 277:44]
+  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit0 = io_rtu_yy_xx_commit0; // @[ct_lsu_pfu_sdb_entry.scala 271:44]
+  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit0_iid = io_rtu_yy_xx_commit0_iid; // @[ct_lsu_pfu_sdb_entry.scala 272:48]
+  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit1 = io_rtu_yy_xx_commit1; // @[ct_lsu_pfu_sdb_entry.scala 273:44]
+  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit1_iid = io_rtu_yy_xx_commit1_iid; // @[ct_lsu_pfu_sdb_entry.scala 274:48]
+  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit2 = io_rtu_yy_xx_commit2; // @[ct_lsu_pfu_sdb_entry.scala 275:44]
+  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_commit2_iid = io_rtu_yy_xx_commit2_iid; // @[ct_lsu_pfu_sdb_entry.scala 276:48]
+  assign ctLsuPfuSdbEntryCmp_rtu_yy_xx_flush = io_rtu_yy_xx_flush; // @[ct_lsu_pfu_sdb_entry.scala 277:42]
   always @(posedge clock) begin
     if (reset) begin // @[ct_lsu_pfu_sdb_entry.scala 57:36]
       pfu_sdb_entry_evict <= 1'h0; // @[ct_lsu_pfu_sdb_entry.scala 57:36]
@@ -323,5 +323,6 @@ end // initial
 `endif
 `endif // SYNTHESIS
 endmodule
+
 
 
