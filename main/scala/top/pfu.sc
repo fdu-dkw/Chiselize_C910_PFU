@@ -654,7 +654,8 @@ class ct_lsu_pfu() extends Module {
 
   //-------------------grnt signal of pmb---------------------
   pfu_pmb_ready_grnt := !pfu_sdb_full || pfu_sdb_has_evict
-  pfu_pmb_entry_ready_grnt := (0 to 7).map(i => pfu_pmb_ready_grnt & pfu_pmb_pop_ptr(i)).reduce(_ ## _)
+  // pfu_pmb_entry_ready_grnt := (0 to 7).map(i => pfu_pmb_ready_grnt & pfu_pmb_pop_ptr(i)).reduce(_ ## _)
+  pfu_pmb_entry_ready_grnt := Seq.fill(8)(pfu_pmb_ready_grnt).reduce(_ ## _) & pfu_pmb_pop_ptr
 
   //------------------create signal of sdb--------------------
   pfu_sdb_create_vld := pfu_pmb_entry_ready.orR
@@ -1035,7 +1036,7 @@ pfu_biu_pe_update_vld    := pfu_biu_pe_update_permit &&  pfu_biu_pe_req
 //if grnt entry only req l1, and lfb_addr_less 2, then do not grnt
  pfu_biu_pe_req_grnt      := pfu_biu_pe_update_permit  &&  (pfu_biu_pe_req_sel_l1 ||  pfu_biu_pe_req_src(0).asBool)
 
-/---------------------grnt signal--------------------------  \\选中信号
+//---------------------grnt signal--------------------------  //选中信号
 //for timing grnt signal add gateclk
  pfu_pfb_entry_biu_pe_req_grnt := Seq.fill(8)(pfu_biu_pe_req_grnt).reduce(_ ## _) & pfu_biu_pe_req_ptr
 pfu_gpfb_biu_pe_req_grnt := pfu_biu_pe_req_grnt  &&  pfu_biu_pe_req_ptr(8).asBool
@@ -1201,27 +1202,4 @@ class gated_clk_cell extends RawModule {
   clk_en_bf_latch := (io.global_en && (io.module_en || io.local_en)) || io.external_en
   SE := io.pad_yy_icg_scan_en
   io.clk_out := io.clk_in
-}
-
-class gated_clk_cell_IO extends Bundle {
-  val clk_in = Input(Clock())
-  val global_en = Input(Bool())
-  val module_en = Input(Bool())
-  val local_en = Input(Bool())
-  val external_en = Input(Bool())
-  val pad_yy_icg_scan_en = Input(Bool())
-  val clk_out = Output(Clock())
-}
-
-class gated_clk_cell extends RawModule {
-  val io = IO(new gated_clk_cell_IO)
-
-  private val clk_en_bf_latch = Wire(UInt(1.W))
-  private val SE = Wire(UInt(1.W))
-
-  clk_en_bf_latch := (io.global_en && (io.module_en || io.local_en)) || io.external_en
-  SE := io.pad_yy_icg_scan_en
-  io.clk_out := io.clk_in
-
-  pfu_pfb_entry_create_vld := Seq.fill(15)(pfu_sdb_pop_ptr(i)).reduce(_ ## _) & pfu_pfb_create_ptr
 }
