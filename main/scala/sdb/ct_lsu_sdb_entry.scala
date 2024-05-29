@@ -62,25 +62,25 @@ class ct_lsu_pfu_sdb_entry extends Module {
   val pfu_sdb_entry_vld = RegInit(false.B)
 
   // Wires
-//  val amr_wa_cancel = Wire(Bool())
-//  val cp0_lsu_icg_en = Wire(Bool())
-//  val cp0_lsu_l2_st_pref_en = Wire(Bool())
-//  val cp0_yy_clk_en = Wire(Bool())
-//  val cpurst_b = Wire(Bool())
-//  val ld_da_iid = Wire(UInt(7.W))
-//  val ld_da_ldfifo_pc = Wire(UInt(15.W))
-//  val ld_da_pfu_act_dp_vld = Wire(Bool())
-//  val ld_da_pfu_evict_cnt_vld = Wire(Bool())
-//  val ld_da_pfu_pf_inst_vld = Wire(Bool())
-//  val ld_da_ppfu_va = Wire(UInt(40.W))
-//  val lsu_special_clk = Wire(Clock())
-//  val pad_yy_icg_scan_en = Wire(Bool())
+  //  val amr_wa_cancel = Wire(Bool())
+  //  val cp0_lsu_icg_en = Wire(Bool())
+  //  val cp0_lsu_l2_st_pref_en = Wire(Bool())
+  //  val cp0_yy_clk_en = Wire(Bool())
+  //  val cpurst_b = Wire(Bool())
+  //  val ld_da_iid = Wire(UInt(7.W))
+  //  val ld_da_ldfifo_pc = Wire(UInt(15.W))
+  //  val ld_da_pfu_act_dp_vld = Wire(Bool())
+  //  val ld_da_pfu_evict_cnt_vld = Wire(Bool())
+  //  val ld_da_pfu_pf_inst_vld = Wire(Bool())
+  //  val ld_da_ppfu_va = Wire(UInt(40.W))
+  //  val lsu_special_clk = Wire(Bool())
+  //  val pad_yy_icg_scan_en = Wire(Bool())
   val pfu_pfb_entry_all_pf_inst_clk = Wire(Clock())
   val pfu_pfb_entry_all_pf_inst_clk_en = Wire(Bool())
-//  val pfu_pop_all_part_vld = Wire(Bool())
+  //  val pfu_pop_all_part_vld = Wire(Bool())
   val pfu_pop_st_all = Wire(Bool())
-//  val pfu_sdb_create_pc = Wire(UInt(15.W))
-//  val pfu_sdb_create_type_ld = Wire(Bool())
+  //  val pfu_sdb_create_pc = Wire(UInt(15.W))
+  //  val pfu_sdb_create_type_ld = Wire(Bool())
   val pfu_sdb_entry_addr_cmp_info_vld = Wire(Bool())
   val pfu_sdb_entry_check_stride_success = Wire(Bool())
   val pfu_sdb_entry_clk = Wire(Clock())
@@ -88,52 +88,52 @@ class ct_lsu_pfu_sdb_entry extends Module {
   val pfu_sdb_entry_create_clk = Wire(Clock())
   val pfu_sdb_entry_create_clk_en = Wire(Bool())
   val pfu_sdb_entry_create_dp_vld = Wire(Bool())
-//  val pfu_sdb_entry_create_dp_vld_x = Wire(Bool())
+  //  val pfu_sdb_entry_create_dp_vld_x = Wire(Bool())
   val pfu_sdb_entry_create_gateclk_en = Wire(Bool())
-//  val pfu_sdb_entry_create_gateclk_en_x = Wire(Bool())
+  //  val pfu_sdb_entry_create_gateclk_en_x = Wire(Bool())
   val pfu_sdb_entry_create_vld = Wire(Bool())
-//  val pfu_sdb_entry_create_vld_x = Wire(Bool())
+  //  val pfu_sdb_entry_create_vld_x = Wire(Bool())
   val pfu_sdb_entry_evict_clr = Wire(Bool())
   val pfu_sdb_entry_evict_set = Wire(Bool())
-//  val pfu_sdb_entry_evict_x = Wire(Bool())
+  //  val pfu_sdb_entry_evict_x = Wire(Bool())
   val pfu_sdb_entry_hit_pc = Wire(Bool())
   val pfu_sdb_entry_hit_pc_for_new = Wire(Bool())
-//  val pfu_sdb_entry_hit_pc_x = Wire(Bool())
+  //  val pfu_sdb_entry_hit_pc_x = Wire(Bool())
   val pfu_sdb_entry_normal_stride = Wire(Bool())
-//  val pfu_sdb_entry_pc_v = Wire(UInt(15.W))
+  //  val pfu_sdb_entry_pc_v = Wire(UInt(15.W))
   val pfu_sdb_entry_pf_inst_vld = Wire(Bool())
   val pfu_sdb_entry_pop_vld = Wire(Bool())
   val pfu_sdb_entry_ready_grnt = Wire(Bool())
-//  val pfu_sdb_entry_ready_grnt_x = Wire(Bool())
+  //  val pfu_sdb_entry_ready_grnt_x = Wire(Bool())
   val pfu_sdb_entry_ready_set = Wire(Bool())
-//  val pfu_sdb_entry_ready_x = Wire(Bool())
+  //  val pfu_sdb_entry_ready_x = Wire(Bool())
   val pfu_sdb_entry_stride = Wire(UInt(11.W))
   val pfu_sdb_entry_stride_neg = Wire(Bool())
-//  val pfu_sdb_entry_stride_neg_x = Wire(Bool())
-//  val pfu_sdb_entry_stride_v = Wire(UInt(11.W))
+  //  val pfu_sdb_entry_stride_neg_x = Wire(Bool())
+  //  val pfu_sdb_entry_stride_v = Wire(UInt(11.W))
   val pfu_sdb_entry_strideh_6to0 = Wire(UInt(7.W))
-//  val pfu_sdb_entry_strideh_6to0_v = Wire(UInt(7.W))
+  //  val pfu_sdb_entry_strideh_6to0_v = Wire(UInt(7.W))
   val pfu_sdb_entry_timeout_cnt_full = Wire(Bool())
-//  val pfu_sdb_entry_type_ld_x = Wire(Bool())
-//  val pfu_sdb_entry_vld_x = Wire(Bool())
+  //  val pfu_sdb_entry_type_ld_x = Wire(Bool())
+  //  val pfu_sdb_entry_vld_x = Wire(Bool())
   val pipe_cmp_inst_vld = Wire(Bool())
   val pipe_cmp_pc = Wire(UInt(15.W))
   val pipe_evict_cnt_vld = Wire(Bool())
   val pipe_iid = Wire(UInt(7.W))
   val pipe_ppfu_va = Wire(UInt(40.W))
-//  val rtu_yy_xx_commit0 = Wire(Bool())
-//  val rtu_yy_xx_commit0_iid = Wire(UInt(7.W))
-//  val rtu_yy_xx_commit1 = Wire(Bool())
-//  val rtu_yy_xx_commit1_iid = Wire(UInt(7.W))
-//  val rtu_yy_xx_commit2 = Wire(Bool())
-//  val rtu_yy_xx_commit2_iid = Wire(UInt(7.W))
-//  val rtu_yy_xx_flush = Wire(Bool())
-////  val sdb_timeout_cnt_val = Wire(UInt(8.W))
-//  val st_da_iid = Wire(UInt(7.W))
-//  val st_da_pc = Wire(UInt(15.W))
-//  val st_da_pfu_evict_cnt_vld = Wire(Bool())
-//  val st_da_pfu_pf_inst_vld = Wire(Bool())
-//  val st_da_ppfu_va = Wire(UInt(40.W))
+  //  val rtu_yy_xx_commit0 = Wire(Bool())
+  //  val rtu_yy_xx_commit0_iid = Wire(UInt(7.W))
+  //  val rtu_yy_xx_commit1 = Wire(Bool())
+  //  val rtu_yy_xx_commit1_iid = Wire(UInt(7.W))
+  //  val rtu_yy_xx_commit2 = Wire(Bool())
+  //  val rtu_yy_xx_commit2_iid = Wire(UInt(7.W))
+  //  val rtu_yy_xx_flush = Wire(Bool())
+  ////  val sdb_timeout_cnt_val = Wire(UInt(8.W))
+  //  val st_da_iid = Wire(UInt(7.W))
+  //  val st_da_pc = Wire(UInt(15.W))
+  //  val st_da_pfu_evict_cnt_vld = Wire(Bool())
+  //  val st_da_pfu_pf_inst_vld = Wire(Bool())
+  //  val st_da_ppfu_va = Wire(UInt(40.W))
 
   //==========================================================
   //                 Instance of Gated Cell
@@ -142,20 +142,20 @@ class ct_lsu_pfu_sdb_entry extends Module {
   pfu_sdb_entry_clk_en := pfu_sdb_entry_vld || pfu_sdb_entry_create_gateclk_en
 
 
-  val gatedClkCell = Module(new GatedClkCell)
+  val gatedClkCell_1 = Module(new gated_clk_cell)
 
-  gatedClkCell.io.clk_in := io.lsu_special_clk
-  pfu_sdb_entry_clk := gatedClkCell.io.clk_out
-  gatedClkCell.io.external_en := false.B
-  gatedClkCell.io.global_en := io.cp0_yy_clk_en
-  gatedClkCell.io.local_en := pfu_sdb_entry_clk_en
-  gatedClkCell.io.module_en := io.cp0_lsu_icg_en
-  gatedClkCell.io.pad_yy_icg_scan_en := io.pad_yy_icg_scan_en
+  gatedClkCell_1.io.clk_in := io.lsu_special_clk
+  pfu_sdb_entry_clk := gatedClkCell_1.io.clk_out
+  gatedClkCell_1.io.external_en := false.B
+  gatedClkCell_1.io.global_en := io.cp0_yy_clk_en
+  gatedClkCell_1.io.local_en := pfu_sdb_entry_clk_en
+  gatedClkCell_1.io.module_en := io.cp0_lsu_icg_en
+  gatedClkCell_1.io.pad_yy_icg_scan_en := io.pad_yy_icg_scan_en
 
   pfu_sdb_entry_create_clk_en := pfu_sdb_entry_create_gateclk_en
 
 
-  val gatedClkCell_2 = Module(new GatedClkCell)
+  val gatedClkCell_2 = Module(new gated_clk_cell)
 
   gatedClkCell_2.io.clk_in := io.lsu_special_clk
   pfu_sdb_entry_create_clk := gatedClkCell_2.io.clk_out
@@ -168,7 +168,7 @@ class ct_lsu_pfu_sdb_entry extends Module {
   pfu_pfb_entry_all_pf_inst_clk_en := pfu_sdb_entry_vld && (io.ld_da_pfu_pf_inst_vld || io.st_da_pfu_pf_inst_vld) || pfu_sdb_entry_create_gateclk_en
 
 
-  val gatedClkCell_3 = Module(new GatedClkCell)
+  val gatedClkCell_3 = Module(new gated_clk_cell)
 
   gatedClkCell_3.io.clk_in := io.lsu_special_clk
   pfu_pfb_entry_all_pf_inst_clk := gatedClkCell_3.io.clk_out
@@ -246,35 +246,35 @@ class ct_lsu_pfu_sdb_entry extends Module {
   //                Instance addr cmp
   //==========================================================
 
-  val ctLsuPfuSdbEntryCmp = Module(new CtlLsuPfuSdbEntryCmp)
+  val ctLsuPfuSdbEntryCmp = Module(new ct_lsu_pfu_sdb_entry_cmp)
 
-    ctLsuPfuSdbEntryCmp.io.cp0_lsu_icg_en := io.cp0_lsu_icg_en
-    ctLsuPfuSdbEntryCmp.io.cp0_yy_clk_en := io.cp0_yy_clk_en
-    ctLsuPfuSdbEntryCmp.io.cpurst_b := io.cpurst_b
-    ctLsuPfuSdbEntryCmp.io.entry_addr0_act := true.B
-    pfu_sdb_entry_addr_cmp_info_vld := ctLsuPfuSdbEntryCmp.io.entry_addr_cmp_info_vld
-    pfu_sdb_entry_check_stride_success := ctLsuPfuSdbEntryCmp.io.entry_check_stride_success
-    ctLsuPfuSdbEntryCmp.io.entry_clk := pfu_sdb_entry_clk
-    ctLsuPfuSdbEntryCmp.io.entry_create_dp_vld := pfu_sdb_entry_create_dp_vld
-    ctLsuPfuSdbEntryCmp.io.entry_create_gateclk_en := pfu_sdb_entry_create_gateclk_en
-    pfu_sdb_entry_normal_stride := ctLsuPfuSdbEntryCmp.io.entry_normal_stride
-    ctLsuPfuSdbEntryCmp.io.entry_pf_inst_vld := pfu_sdb_entry_pf_inst_vld
-    pfu_sdb_entry_stride := ctLsuPfuSdbEntryCmp.io.entry_stride
-    ctLsuPfuSdbEntryCmp.io.entry_stride_keep := false.B
-    pfu_sdb_entry_stride_neg := ctLsuPfuSdbEntryCmp.io.entry_stride_neg
-    pfu_sdb_entry_strideh_6to0 := ctLsuPfuSdbEntryCmp.io.entry_strideh_6to0
-    ctLsuPfuSdbEntryCmp.io.entry_vld := pfu_sdb_entry_vld
-    ctLsuPfuSdbEntryCmp.io.forever_cpuclk := io.lsu_special_clk
-    ctLsuPfuSdbEntryCmp.io.ld_da_iid := pipe_iid
-    ctLsuPfuSdbEntryCmp.io.pad_yy_icg_scan_en :=io.pad_yy_icg_scan_en
-    ctLsuPfuSdbEntryCmp.io.pipe_va := pipe_ppfu_va
-    ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit0 := io.rtu_yy_xx_commit0
-    ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit0_iid := io.rtu_yy_xx_commit0_iid
-    ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit1 := io.rtu_yy_xx_commit1
-    ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit1_iid := io.rtu_yy_xx_commit1_iid
-    ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit2 := io.rtu_yy_xx_commit2
-    ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit2_iid := io.rtu_yy_xx_commit2_iid
-    ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_flush := io.rtu_yy_xx_flush
+  ctLsuPfuSdbEntryCmp.io.cp0_lsu_icg_en := io.cp0_lsu_icg_en
+  ctLsuPfuSdbEntryCmp.io.cp0_yy_clk_en := io.cp0_yy_clk_en
+  ctLsuPfuSdbEntryCmp.io.cpurst_b := io.cpurst_b
+  ctLsuPfuSdbEntryCmp.io.entry_addr0_act := true.B
+  pfu_sdb_entry_addr_cmp_info_vld := ctLsuPfuSdbEntryCmp.io.entry_addr_cmp_info_vld
+  pfu_sdb_entry_check_stride_success := ctLsuPfuSdbEntryCmp.io.entry_check_stride_success
+  ctLsuPfuSdbEntryCmp.io.entry_clk := pfu_sdb_entry_clk
+  ctLsuPfuSdbEntryCmp.io.entry_create_dp_vld := pfu_sdb_entry_create_dp_vld
+  ctLsuPfuSdbEntryCmp.io.entry_create_gateclk_en := pfu_sdb_entry_create_gateclk_en
+  pfu_sdb_entry_normal_stride := ctLsuPfuSdbEntryCmp.io.entry_normal_stride
+  ctLsuPfuSdbEntryCmp.io.entry_pf_inst_vld := pfu_sdb_entry_pf_inst_vld
+  pfu_sdb_entry_stride := ctLsuPfuSdbEntryCmp.io.entry_stride
+  ctLsuPfuSdbEntryCmp.io.entry_stride_keep := false.B
+  pfu_sdb_entry_stride_neg := ctLsuPfuSdbEntryCmp.io.entry_stride_neg
+  pfu_sdb_entry_strideh_6to0 := ctLsuPfuSdbEntryCmp.io.entry_strideh_6to0
+  ctLsuPfuSdbEntryCmp.io.entry_vld := pfu_sdb_entry_vld
+  ctLsuPfuSdbEntryCmp.io.forever_cpuclk := io.lsu_special_clk
+  ctLsuPfuSdbEntryCmp.io.ld_da_iid := pipe_iid
+  ctLsuPfuSdbEntryCmp.io.pad_yy_icg_scan_en :=io.pad_yy_icg_scan_en
+  ctLsuPfuSdbEntryCmp.io.pipe_va := pipe_ppfu_va
+  ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit0 := io.rtu_yy_xx_commit0
+  ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit0_iid := io.rtu_yy_xx_commit0_iid
+  ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit1 := io.rtu_yy_xx_commit1
+  ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit1_iid := io.rtu_yy_xx_commit1_iid
+  ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit2 := io.rtu_yy_xx_commit2
+  ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_commit2_iid := io.rtu_yy_xx_commit2_iid
+  ctLsuPfuSdbEntryCmp.io.rtu_yy_xx_flush := io.rtu_yy_xx_flush
 
   //==========================================================
   //                 pipe info select
@@ -359,7 +359,7 @@ class ct_lsu_pfu_sdb_entry extends Module {
 //  addResource("/gated_clk_cell.v")
 //}
 
-class GatedClkCell extends BlackBox  {
+class gated_clk_cell extends BlackBox  {
   val io = IO(new Bundle {
     val clk_in = Input(Clock())
     val clk_out = Output(Clock())
@@ -443,7 +443,7 @@ class GatedClkCell extends BlackBox  {
 //  addResource("/ct_lsu_pfu_sdb_cmp.v")
 //}
 
-class CtlLsuPfuSdbEntryCmp extends BlackBox {
+class ct_lsu_pfu_sdb_entry_cmp extends BlackBox {
   val io = IO(new Bundle {
     val cp0_lsu_icg_en = Input(Bool())
     val cp0_yy_clk_en = Input(Bool())
