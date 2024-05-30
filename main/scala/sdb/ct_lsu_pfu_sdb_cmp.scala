@@ -79,7 +79,7 @@ class ct_lsu_pfu_sdb_cmp extends Module {
   val entry_iid_2_next = Wire(UInt(7.W))
   val entry_iid_newer_than_ld_da = Wire(Vec(3,UInt(1.W)))
   val entry_newer_than_ld_da = Wire(Vec(3,UInt(1.W)))
-  val entry_normal_stride = Wire(Bool())
+  val entry_normal_stride1 = Wire(Bool())
   val entry_pf_inst_vld = io.entry_pf_inst_vld
   val entry_sel_2 = Wire(Bool())
   val entry_stride_0to1 = Wire(UInt(40.W))
@@ -401,8 +401,8 @@ class ct_lsu_pfu_sdb_cmp extends Module {
   entry_stride_0to1_cross_2k := entry_stride_neg.asBool && entry_stride_0to1_neg_cross_2k.asBool || !(entry_stride_neg.asBool) && entry_stride_0to1_pos_cross_2k.asBool
 
   //----------------------judge stride------------------------
-  entry_normal_stride := !(entry_stride_0to1_zero.asBool) && !entry_stride_0to1_cross_2k && entry_stride_diff_eq.asBool
-  entry_check_stride_success := entry_normal_stride && entry_stride_cmp0_eq.asBool
+  entry_normal_stride1 := !(entry_stride_0to1_zero.asBool) && !entry_stride_0to1_cross_2k && entry_stride_diff_eq.asBool
+  entry_check_stride_success := entry_normal_stride1 && entry_stride_cmp0_eq.asBool
 
   //==========================================================
   //                    Addr info wires
@@ -421,7 +421,7 @@ class ct_lsu_pfu_sdb_cmp extends Module {
 
   io.entry_addr_cmp_info_vld := entry_addr_cmp_info_vld.asBool
   io.entry_check_stride_success := entry_check_stride_success
-  io.entry_normal_stride := entry_normal_stride
+  io.entry_normal_stride := entry_normal_stride1
   io.entry_stride := entry_stride
   io.entry_stride_neg := entry_stride_neg.asBool
   io.entry_strideh_6to0 := entry_strideh_6to0
