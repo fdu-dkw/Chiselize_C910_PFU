@@ -353,13 +353,13 @@ class ct_lsu_pfu() extends Module {
     // x_ct_lsu_pfu_pmb_entry(i).ld_da_pfu_pf_inst_vld := io.ld_da_pfu_pf_inst_vld
     // x_ct_lsu_pfu_pmb_entry(i).lsu_special_clk := io.lsu_special_clk
     // x_ct_lsu_pfu_pmb_entry(i).pad_yy_icg_scan_en := io.pad_yy_icg_scan_en
-    pfu_pmb_entry_create_dp_vld(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_create_dp_vld_x
-    pfu_pmb_entry_create_gateclk_en(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_create_gateclk_en_x
-    pfu_pmb_entry_create_vld(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_create_vld_x
+    x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_create_dp_vld_x:=  pfu_pmb_entry_create_dp_vld(i)
+    x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_create_gateclk_en_x:=  pfu_pmb_entry_create_gateclk_en(i)
+   x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_create_vld_x:=  pfu_pmb_entry_create_vld(i) 
     pfu_pmb_entry_evict(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_evict_x
     pfu_pmb_entry_hit_pc(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_hit_pc_x
     pfu_pmb_entry_pc(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_pc_v
-    pfu_pmb_entry_ready_grnt(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_ready_grnt_x
+     x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_ready_grnt_x:= pfu_pmb_entry_ready_grnt(i)
     pfu_pmb_entry_ready(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_ready_x
     pfu_pmb_entry_type_ld(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_type_ld_x
     pfu_pmb_entry_vld(i) := x_ct_lsu_pfu_pmb_entry(i).pfu_pmb_entry_vld_x
