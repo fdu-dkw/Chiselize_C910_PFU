@@ -4,19 +4,6 @@ package ct_lsu_pfu_pmb_entry_package
 import chisel3._
 import chisel3.util._
 
-class gated_clk_cell extends Module {
-  val io = IO(new Bundle{
-    val clk_in = Input(Clock())
-    val global_en = Input(Bool())
-    val module_en = Input(Bool())
-    val local_en = Input(Bool())
-    val external_en = Input(Bool())
-    val pad_yy_icg_scan_en = Input(Bool())
-    val clk_out = Output(Clock())
-  })
-  io.clk_out := io.clk_in
-}
-
 class ct_lsu_pfu_pmb_entry extends Module {
   //io all below
   val io = IO(new Bundle {
@@ -237,4 +224,15 @@ class ct_lsu_pfu_pmb_entry extends Module {
           io.pfu_pmb_entry_type_ld_x := pfu_pmb_entry_type_ld
           //-----------hit signal-----------------
           io.pfu_pmb_entry_hit_pc_x := pfu_pmb_entry_hit_pc_for_new
+}
+class gated_clk_cell extends BlackBox {
+  val io = IO(new Bundle {
+    val clk_in = Input(Clock())
+    val external_en = Input(Bool())
+    val global_en = Input(Bool())
+    val local_en = Input(Bool())
+    val module_en = Input(Bool())
+    val pad_yy_icg_scan_en = Input(Bool())
+    val clk_out = Output(Clock())
+  })
 }
