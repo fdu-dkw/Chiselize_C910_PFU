@@ -1,0 +1,112 @@
+# gpfb顶层模块
+
+## gpfb
+
+### 时钟：
+
+例化两个gated clk时钟，
+
+##### 第一个时钟：
+
+产生一个pfu_gpfb_clk的output，条件是gpfb的tsm处于运行状态（也是gpfb处于运行状态）**或者**gsdb发送了可以创建gpfb信号
+
+该时钟在之后的l1sm，l2sm,tsm变成了entry_clk，可以大概看作是全局gpfb的时序控制时钟
+
+##### 第二个时钟：
+
+产生一个pfu_gpfb_create_clk的output，条件是gsdb发送了可以创建gpfb信号（即可以开始预取请求了）
+
+该时钟在之后只用来更新gsdb计算好的strideh。且只有gsdb开始预取请求
+
+### 和gsdb互动：
+
+接收gsdb传来的stride并进行一些处理，生成gpfb的strideh
+
+由gsdb发送预取要求，gpfb中tsm从idle进入运行状态；
+
+### 与状态机互动：
+
+得到gsdb预取请求**而且**ld达到da阶段并授权了预取，才能预取，激发tsm以及l1sm等的改变
+
+l1sm或者l2sm处于运行状态，并且ld达到da阶段，使能tsm的状态转移
+
+### 做一些计算：
+
+#### 产生比较信息，作为控制信号:
+
+计算有没有超出预取深度，并控制之后l1sm和l2sm，tsm的运行。l1是32位的预取深度，l2是128位的
+
+根据l1sm和l2sm的reinit_req情况产生gpfb的reinit
+
+pfu顶层要求pop**或者**tsm处于运行状态**并且**一些dcache命中或者l2dcache命中，那么就产生pop信号
+
+#### 计算：
+
+计算最大预取范围。见知乎，和预取深度有关
+
+
+
+## l1sm/l2sm
+
+核心是状态机，这里仅讲清状态机。
+
+**other**状态：无论处于什么状态，cpurst,pop,reinit,！pref_en都会导致回到INIT_PF_ADDR状态
+
+**INIT_PF_ADDR**状态：当tsm处于judge状态，已经做好准备发出请求，并且使能了pref，进入ADD_PF_VA状态，状态机进入工作状态
+
+**ADD_PF_VA**状态：这个阶段授权va的add，并计算是否跨4K,不判决，直接进入REQ_PF状态
+
+**REQ_PF**状态：处理biu_pe_req_set，当已经发出biu_pe_req（先有gsdb发入req再tsm处理找到是l1的还是l2的，最后发到l1sm中），并且在pf的范围内，就
+
+
+
+**L1_REQ_MMU**：请求MMU去翻译跨4K情况，并进入**WAIT_PPN**
+
+**WAIT_PPN**：等待翻译得到的物理地址PPN，给了就再去**REQ_PF**，没给就去**DEAD**
+
+**DEAD**：这个预取地址不可取。当预取要跨4K而且MHINT设置了不能使用MMU去翻译的话，直接挂掉，等待下一个新的想要预取的地址。
+
+
+
+当gsdb完成stride计算后，l1sm会一直运行，不断的加步幅，产生新的va。关注**entry_l1_pf_va_add_vld**，他在ADD_PF_VA状态**或者**biu授权后
+
+都可以为高。因此，当biu完成授权，就会自己加步幅生成新的va。（这个自加va主要依靠biu什么时候授权）
+
+
+
+并且还有一个端口一直去检测新的va有没有和inst_va差距达到最大预取深度，达到了就
+
+
+
+## tsm
+
+### IDLE状态：
+
+tsm处于不运行状态，当pop之后或者cpurst之后会处于该状态。当gsdb发送新的stride之后，会进入INIT_INST_NEW_VA状态。该状态下时钟不被使能
+
+### INIT_INST_NEW_VA状态：
+
+ 当到达da阶段的指令出现cache miss的时候，将该指令的访问地址加上步幅得到`inst_new_va`，同时需要判断该地址有没有跨4k页，如果没有则跳转到 **JUDGE** 代表地址计算完成。如果有，就一直呆在INIT_INST_NEW_VA状态。（应该会一直等待下一个load指令的新va，这时候就不再是跨4K页了，不仅减少了总体功耗，而且简化了设计复杂度）
+
+### JUDGE状态:
+
+当reinit时候，会转入INIT_INST_NEW_VA状态，否则一直呆在judge状态。pop或者cpurst依然会进入IDLE状态。该状态下代表地址计算完成，产生`entry_tsm_is_judge`信号，进入l1sm或者l2sm的状态机准备向总线发出预取请求。
+
+
+
+tsm的时钟：当IDLE的时候，时钟不被使能。该时钟被用来更新va和priv
+
+
+
+## 一些端口辨析
+
+### entry_l1_cmp_va_vld与pfu_gpfb_l1sm_va_can_cmp区别：
+
+pfu_gpfb_l1sm_va_can_cmp表示l1sm状态机处于运转（即在那几个重要状态中），而entry_l1_cmp_va_vld不仅表示在运转而且得到了biu授权，可以再次计算新的va，即**entry_l1_pf_va_add_vld**开放
+
+
+
+
+
+
+
